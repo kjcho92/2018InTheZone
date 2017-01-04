@@ -110,7 +110,7 @@ task usercontrol()
 		{
 			MoveClaw(100);
 			wait1Msec(100);
-			MoveClaw(15);
+			MoveClaw(0);
 		}
 		if (vexRT[Btn6U] == 1)
 		{
@@ -129,6 +129,11 @@ task usercontrol()
 			MoveLift(powerLift);
 			wait1Msec(50);
 			MoveLift(-10);
+		}
+		if (vexRT[Btn8R] == 1)
+		{
+			int powerLift = 35;	
+			MoveLift(powerLift);
 		}
 		if (vexRT[Btn5U] == 1)
 		{
