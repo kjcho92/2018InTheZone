@@ -109,6 +109,8 @@ task usercontrol()
 		if (vexRT[Btn6D] == 1)
 		{
 			MoveClaw(120);
+			wait1Msec(100);
+			MoveClaw(0);
 		}
 		if (vexRT[Btn6U] == 1)
 		{
