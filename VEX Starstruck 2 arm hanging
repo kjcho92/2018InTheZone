@@ -108,19 +108,19 @@ task usercontrol()
 	startTask (Move);
 		if (vexRT[Btn6D] == 1)
 		{
-			MoveClaw(120);
+			MoveClaw(100);
 			wait1Msec(100);
 			MoveClaw(0);
 		}
 		if (vexRT[Btn6U] == 1)
 		{
-			MoveClaw(-120);
+			MoveClaw(-110);
 			wait1Msec(100);
-			MoveClaw(-35);
+			MoveClaw(-15);
 		}
 		if (vexRT[Btn7U] == 1)
 		{
-			int powerLift = 100;
+			int powerLift = 70;
 			MoveLift(powerLift);
 		}
 		if (vexRT[Btn7D] == 1)
@@ -130,6 +130,11 @@ task usercontrol()
 			wait1Msec(50);
 			MoveLift(-10);
 		}
+		if (vexRT[Btn8R] == 1)
+		{
+			int powerLift = 35;
+			MoveLift(powerLift);
+		}
 		if (vexRT[Btn5U] == 1)
 		{
 			int powerLift = 100;
@@ -138,7 +143,12 @@ task usercontrol()
 		}
 		if (vexRT[Btn5D] == 1)
 		{
-			int powerHang = -100;
+			int powerHang = -127;
+			MoveHanging(powerHang);
+		}
+		if (vexRT[Btn7R] == 1)
+		{
+			int powerHang = -40;
 			MoveHanging(powerHang);
 		}
 		if (vexRT[Btn8L] == 1)
@@ -147,10 +157,6 @@ task usercontrol()
 			MoveLift(power);
 			MoveHanging(power);
 			MoveClaw(power);
-		}
-		if (vexRT[Btn8R] == 1)
-		{
-			MoveLift(20);
 		}
 
 	}
