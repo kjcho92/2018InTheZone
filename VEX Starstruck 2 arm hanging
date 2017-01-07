@@ -59,6 +59,7 @@ void TurnValueGyro(int distance, int power);
 void Turn(int power);
 void Shift(int power);
 void ShiftValue(int distance, int power);
+void LockWheel();
 
 int AdjustPowerUsingBatteryLevel(int originalPower);
 
@@ -112,7 +113,7 @@ void Autonomous1()
 	// StartAuto(); //Opens out claw
 
 	int globalWaiter = 200;
-
+	LockWheel();
 	MoveClaw(120); // closes claw
 
 	ShiftValue(150, -120); // shifts right
@@ -139,9 +140,11 @@ void Autonomous1()
 	wait1Msec(300);
 
 	powerLift = 120;
-	LiftUp(2800, powerLift); // lift up fast
- 	MoveClaw(-120); // opens claw
-	wait1Msec(500);
+	LiftUpNoStop(2500, powerLift);
+	MoveClaw(-120);
+	wait1Msec(100);
+	MoveLift(0);
+	wait1Msec(300);
 	MoveClaw(-30); // opens claw
 
 	// Done the first part
@@ -169,9 +172,11 @@ void Autonomous1()
 	wait1Msec(300);
 
 	powerLift = 120;
-	LiftUp(2800, powerLift); // lift up fast
- 	MoveClaw(-120); // opens claw
-	wait1Msec(500);
+	LiftUpNoStop(2500, powerLift);
+	MoveClaw(-120);
+	wait1Msec(100);
+	MoveLift(0);
+	wait1Msec(300);
 	MoveClaw(0); // opens claw
 }
 
@@ -213,14 +218,14 @@ task usercontrol()
 
 		wait1Msec(50);
 
-		if (vexRT[Btn6U] == 1)
+		if (vexRT[Btn6D] == 1)
 		{
 			// Opens claw
 			MoveClaw(-120);
 			wait1Msec(100);
 			MoveClaw(0);
 		}
-		if (vexRT[Btn6D] == 1)
+		if (vexRT[Btn6U] == 1)
 		{
 			// Closes claw
 			MoveClaw(100);
@@ -294,6 +299,9 @@ task Lift ()
 	while (true)
 	{
 		wait1Msec(50);
+		if (vexRT[Btn8D] == 1){
+			LockWheel();
+		}
 
 		if (vexRT[Btn8R] == 1)
 		{
@@ -334,9 +342,9 @@ task Lift ()
 				// MoveClaw(0);
 
 				int powerLift = 120;
-				LiftUpNoStop(2600, powerLift);
+				LiftUpNoStop(2500, powerLift);
 				MoveClaw(-120);
-				wait1Msec(200);
+				wait1Msec(100);
 				MoveLift(0);
 				wait1Msec(300);
 				MoveClaw(0);
@@ -475,6 +483,14 @@ void MoveHanging(int power)
 }
 void MoveClaw(int power)
 {
-	motor[ClawLeft] = -power;
-	motor[ClawRight] = -power;
+	motor[ClawLeft] = power;
+	motor[ClawRight] = power;
+}
+void LockWheel()
+{
+			MoveHanging(80);
+			wait1Msec(300);
+			MoveHanging(-80);
+			wait1Msec(220);
+			MoveHanging(0);
 }
