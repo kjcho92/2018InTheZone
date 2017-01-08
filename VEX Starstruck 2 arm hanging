@@ -46,6 +46,7 @@ task Hang();
 
 // Autonomous
 void Autonomous1();
+void Autonomous2();
 void ClearEncoder();
 void MoveValue(int distance, int power);
 void GoStraight(int power);
@@ -99,7 +100,7 @@ task autonomous()
 {
 	long startTime = nPgmTime;
 
-	Autonomous1();
+	Autonomous2();
 
 	writeDebugStreamLine("autonomous) Time: %d", nPgmTime - startTime);
 }
@@ -108,12 +109,16 @@ task autonomous()
 // .....................................................................................
 // Autonomous 1: Knocks two stars on the left side of middle fence
 // .....................................................................................
+
 void Autonomous1()
 {
 	// StartAuto(); //Opens out claw
 
+
+	//Auton
 	int globalWaiter = 200;
 	LockWheel();
+	wait1Msec(300);
 	MoveClaw(120); // closes claw
 
 	ShiftValue(150, -120); // shifts right
@@ -123,7 +128,7 @@ void Autonomous1()
 
 	wait1Msec(1000); // waits until the claw pickes up the cube
 
-	int powerLift = 50;
+	int powerLift = 40;
 	MoveLift(powerLift); // lift up slightly
 	wait1Msec(500);
 
@@ -139,7 +144,7 @@ void Autonomous1()
 	MoveValue(110, -120); // moves to the wall
 	wait1Msec(300);
 
-	powerLift = 120;
+	powerLift = 105;
 	LiftUpNoStop(2500, powerLift);
 	MoveClaw(-120);
 	wait1Msec(100);
@@ -149,7 +154,7 @@ void Autonomous1()
 
 	// Done the first part
 
-	powerLift = -40;
+	powerLift = -20;
 	LiftDown(1500, powerLift); // lift down
 
 	powerLift = -15;
@@ -163,12 +168,11 @@ void Autonomous1()
 	wait1Msec(1000); // waits until the claw pickes up the stars
 
 	MoveClaw(10); // holds the claw
-
 	powerLift = 50;
 	MoveLift(powerLift); // lift up slightly
 	wait1Msec(500);
 
-	MoveValue(260, -120); // moves to the wall
+	MoveValue(280, -120); // moves to the wall
 	wait1Msec(300);
 
 	powerLift = 120;
@@ -179,7 +183,117 @@ void Autonomous1()
 	wait1Msec(300);
 	MoveClaw(0); // opens claw
 }
+void Autonomous2(){
+	int globalWaiter = 200;
+	////lockWheel();
+	//wait1Msec(300);
+	MoveClaw(120); // closes claw
 
+	MoveValue(120, -60); //move back a bit
+	wait1Msec(500);
+	MoveClaw(0); //stop closing
+//	MoveValue(20, 40);//come back forward a little
+	for (int i = 0; i<4; i++){
+		wait1Msec(1200);
+		MoveClaw(120); //start closing
+		wait1Msec(1000);
+		int powerLift = 30;
+		MoveLift(powerLift); // lift up slightly
+		wait1Msec(500);
+		int goBack = 290;
+		if (i==0){
+				goBack = 320;
+		}
+		MoveValue(goBack, -60); //move back to fence
+		powerLift = 105;
+		LiftUpNoStop(2500, powerLift);
+		MoveClaw(-120);
+		if (i>1){
+			wait1Msec(180 * ((i+1)/2));
+		}
+		else{
+		wait1Msec(200);
+		}
+		MoveLift(0);
+		wait1Msec(300);
+		MoveClaw(-30); // opens claw
+		powerLift = -20;
+		LiftDown(1500, powerLift); // lift down
+		wait1Msec(700);
+		MoveClaw(0);
+		goBack = 290;
+		if (i==3){
+			goBack = 175;
+		}
+		MoveValue(goBack, 60); //move back to wall
+	}
+	int angle = 300;
+	TurnValueGyro(angle, 80); // rotates to the wall
+	wait1Msec(globalWaiter);
+	//auton
+	MoveValue(120, 120); // moves forward to cube
+
+	wait1Msec(1000); // waits until the claw pickes up the cube
+
+	int powerLift = 40;
+	MoveLift(powerLift); // lift up slightly
+	wait1Msec(500);
+
+	MoveValue(95, 120); // moves forward to the center
+	wait1Msec(globalWaiter);
+
+	MoveClaw(10); // holds the claw
+
+	angle = 300;
+	TurnValueGyro(angle, -80); // rotates to the wall
+	wait1Msec(globalWaiter);
+
+	MoveValue(60, -120); // moves to the wall
+	wait1Msec(300);
+
+	powerLift = 105;
+	LiftUpNoStop(2500, powerLift);
+	MoveClaw(-120);
+	wait1Msec(100);
+	MoveLift(0);
+	wait1Msec(300);
+	MoveClaw(-30); // opens claw
+
+	// Done the first part
+
+	powerLift = -20;
+	LiftDown(1500, powerLift); // lift down
+
+	powerLift = -15;
+	MoveLift(powerLift); // lift up slightly
+	MoveClaw(0);
+
+	MoveValue(260, 120); // moves forward to the stars
+	wait1Msec(globalWaiter);
+
+	MoveClaw(120); // closes claw
+	wait1Msec(1000); // waits until the claw pickes up the stars
+
+	MoveClaw(10); // holds the claw
+	powerLift = 50;
+	MoveLift(powerLift); // lift up slightly
+	wait1Msec(500);
+
+	MoveValue(280, -120); // moves to the wall
+	wait1Msec(300);
+
+	powerLift = 120;
+	LiftUpNoStop(2500, powerLift);
+	MoveClaw(-120);
+	wait1Msec(100);
+	MoveLift(0);
+	wait1Msec(300);
+	MoveClaw(0);
+
+
+
+
+}
 
 void ClearEncoder() {
 	nMotorEncoder[FrontRight] = 0;
@@ -352,7 +466,7 @@ task Lift ()
 			}
 			if (vexRT[Btn7D] == 1)
 			{
-				int powerLift = -40;
+				int powerLift = -20;
 				LiftDown(1500, powerLift);
 
 				// Down lift
@@ -421,7 +535,7 @@ void MoveValue(int distance, int power) {
 	while (abs(nMotorEncoder[FrontRight])<abs(distance)){
 		GoStraight(power);
 	}
-		GoStraight(0);
+	GoStraight(0);
 }
 
 void GoStraight(int power)
@@ -456,7 +570,7 @@ void ShiftValue(int distance, int power) {
 	while (abs(nMotorEncoder[FrontRight])<abs(distance)){
 		Shift(power);
 	}
-		Shift(0);
+	Shift(0);
 }
 
 
@@ -488,9 +602,9 @@ void MoveClaw(int power)
 }
 void LockWheel()
 {
-			MoveHanging(80);
-			wait1Msec(300);
-			MoveHanging(-80);
-			wait1Msec(220);
-			MoveHanging(0);
+	MoveHanging(80);
+	wait1Msec(300);
+	MoveHanging(-80);
+	wait1Msec(220);
+	MoveHanging(0);
 }
