@@ -45,8 +45,13 @@ task Lift();
 task Hang();
 
 // Autonomous
+int autonomousMode = 1;
+void DisplayAutonomousMode(int autonomousModeValue);
+void displayBatteryLevelOnLCD(int autonomousModeValue);
+void AutonomousSelector(int btnLCD);
 void Autonomous1();
-void Autonomous2();
+void ProgrammingSkill();
+void ProgrammingSkill_Extended();
 void ClearEncoder();
 void MoveValue(int distance, int power);
 void GoStraight(int power);
@@ -62,6 +67,7 @@ void Shift(int power);
 void ShiftValue(int distance, int power);
 void LockWheel();
 
+float adjustValue(float value, float proportion);
 int AdjustPowerUsingBatteryLevel(int originalPower);
 
 
@@ -100,7 +106,23 @@ task autonomous()
 {
 	long startTime = nPgmTime;
 
-	Autonomous2();
+
+	if (autonomousMode == 1)
+	{
+		Autonomous1();
+	}
+	else if (autonomousMode == 2)
+	{
+		ProgrammingSkill();
+	}
+	else if (autonomousMode == 3)
+	{
+		ProgrammingSkill_Extended();
+	}
+	else
+	{
+		Autonomous1();
+	}
 
 	writeDebugStreamLine("autonomous) Time: %d", nPgmTime - startTime);
 }
@@ -117,11 +139,11 @@ void Autonomous1()
 
 	//Auton
 	int globalWaiter = 200;
-	LockWheel();
+	//LockWheel();
 	wait1Msec(300);
 	MoveClaw(120); // closes claw
 
-	ShiftValue(150, -120); // shifts right
+	ShiftValue(155, -120); // shifts right
 	wait1Msec(globalWaiter);
 
 	MoveValue(120, 120); // moves forward to cube
@@ -137,7 +159,7 @@ void Autonomous1()
 
 	MoveClaw(10); // holds the claw
 
-	int angle = 300;
+	int angle = 350;
 	TurnValueGyro(angle, -80); // rotates to the wall
 	wait1Msec(globalWaiter);
 
@@ -158,19 +180,20 @@ void Autonomous1()
 	LiftDown(1500, powerLift); // lift down
 
 	powerLift = -15;
-	MoveLift(powerLift); // lift up slightly
+	MoveLift(powerLift); // holds down the lift slightly
 	MoveClaw(0);
 
-	MoveValue(260, 120); // moves forward to the stars
+	MoveValue(265, 120); // moves forward to the stars
 	wait1Msec(globalWaiter);
 
 	MoveClaw(120); // closes claw
-	wait1Msec(1000); // waits until the claw pickes up the stars
+	wait1Msec(1200); // waits until the claw pickes up the stars
 
-	MoveClaw(10); // holds the claw
 	powerLift = 50;
 	MoveLift(powerLift); // lift up slightly
 	wait1Msec(500);
+
+	MoveClaw(20); // holds the claw
 
 	MoveValue(280, -120); // moves to the wall
 	wait1Msec(300);
@@ -183,7 +206,8 @@ void Autonomous1()
 	wait1Msec(300);
 	MoveClaw(0); // opens claw
 }
-void Autonomous2(){
+
+void ProgrammingSkill(){
 	int globalWaiter = 200;
 	////lockWheel();
 	//wait1Msec(300);
@@ -193,13 +217,15 @@ void Autonomous2(){
 	wait1Msec(500);
 	MoveClaw(0); //stop closing
 //	MoveValue(20, 40);//come back forward a little
-	for (int i = 0; i<4; i++){
+	// for (int i = 0; i<4; i++){
+	for (int i = 0; i<1; i++){
 		wait1Msec(1200);
 		MoveClaw(120); //start closing
 		wait1Msec(1000);
 		int powerLift = 30;
 		MoveLift(powerLift); // lift up slightly
 		wait1Msec(500);
+		MoveClaw(20); // holds claw
 		int goBack = 290;
 		if (i==0){
 				goBack = 320;
@@ -222,16 +248,22 @@ void Autonomous2(){
 		wait1Msec(700);
 		MoveClaw(0);
 		goBack = 290;
-		if (i==3){
-			goBack = 175;
+		// if (i==3){
+		if (i==0){
+			goBack = 220;
 		}
 		MoveValue(goBack, 60); //move back to wall
 	}
+
+	wait1Msec(1000);
+
 	int angle = 300;
-	TurnValueGyro(angle, 80); // rotates to the wall
+	TurnValueGyro(angle, 80); // rotates to the center cube
 	wait1Msec(globalWaiter);
 	//auton
-	MoveValue(120, 120); // moves forward to cube
+	MoveValue(130, 120); // moves forward to cube
+
+	MoveClaw(120); // closes claw
 
 	wait1Msec(1000); // waits until the claw pickes up the cube
 
@@ -242,9 +274,9 @@ void Autonomous2(){
 	MoveValue(95, 120); // moves forward to the center
 	wait1Msec(globalWaiter);
 
-	MoveClaw(10); // holds the claw
+	MoveClaw(50); // holds the claw
 
-	angle = 300;
+	angle = 450;
 	TurnValueGyro(angle, -80); // rotates to the wall
 	wait1Msec(globalWaiter);
 
@@ -274,12 +306,12 @@ void Autonomous2(){
 	MoveClaw(120); // closes claw
 	wait1Msec(1000); // waits until the claw pickes up the stars
 
-	MoveClaw(10); // holds the claw
+	MoveClaw(50); // holds the claw
 	powerLift = 50;
 	MoveLift(powerLift); // lift up slightly
 	wait1Msec(500);
 
-	MoveValue(280, -120); // moves to the wall
+	MoveValue(320, -120); // moves to the wall
 	wait1Msec(300);
 
 	powerLift = 120;
@@ -288,10 +320,238 @@ void Autonomous2(){
 	wait1Msec(100);
 	MoveLift(0);
 	wait1Msec(300);
+	MoveClaw(-30); // opens claw
+
+	// try one more time to pick up the stars around the fence
+
+
+	powerLift = -20;
+	LiftDown(1500, powerLift); // lift down
+
+	powerLift = -15;
+	MoveLift(powerLift); // holds down the lift slightly
 	MoveClaw(0);
 
+	MoveValue(260, 120); // moves forward to the stars
+	wait1Msec(globalWaiter);
+
+	MoveClaw(120); // closes claw
+	wait1Msec(1000); // waits until the claw pickes up the stars
+
+	MoveClaw(10); // holds the claw
+	powerLift = 50;
+	MoveLift(powerLift); // lift up slightly
+	wait1Msec(500);
+
+	MoveValue(320, -120); // moves to the wall
+	wait1Msec(300);
+
+	powerLift = 120;
+	LiftUpNoStop(2500, powerLift);
+	MoveClaw(-120);
+	wait1Msec(100);
+	MoveLift(0);
+	wait1Msec(300);
+	MoveClaw(-30); // opens claw
+
+	MoveClaw(0); // opens claw
+
+}
+
+void ProgrammingSkill_Extended(){
+	int globalWaiter = 200;
+	////lockWheel();
+	//wait1Msec(300);
+	MoveClaw(120); // closes claw
+
+	MoveValue(120, -60); //move back a bit
+	wait1Msec(500);
+	MoveClaw(0); //stop closing
+//	MoveValue(20, 40);//come back forward a little
+	// for (int i = 0; i<4; i++){
+	for (int i = 0; i<1; i++){
+		wait1Msec(1200);
+		MoveClaw(120); //start closing
+		wait1Msec(1000);
+		int powerLift = 30;
+		MoveLift(powerLift); // lift up slightly
+		wait1Msec(500);
+		MoveClaw(20); // holds claw
+		int goBack = 290;
+		if (i==0){
+				goBack = 320;
+		}
+		MoveValue(goBack, -60); //move back to fence
+		powerLift = 105;
+		LiftUpNoStop(2500, powerLift);
+		MoveClaw(-120);
+		if (i>1){
+			wait1Msec(180 * ((i+1)/2));
+		}
+		else{
+		wait1Msec(200);
+		}
+		MoveLift(0);
+		wait1Msec(300);
+		MoveClaw(-30); // opens claw
+		powerLift = -20;
+		LiftDown(1500, powerLift); // lift down
+		wait1Msec(700);
+		MoveClaw(0);
+		goBack = 290;
+		// if (i==3){
+		if (i==0){
+			goBack = 220;
+		}
+		MoveValue(goBack, 60); //move back to wall
+	}
+
+	wait1Msec(1000);
+
+	int angle = 300;
+	TurnValueGyro(angle, 80); // rotates to the center cube
+	wait1Msec(globalWaiter);
+	//auton
+	MoveValue(130, 120); // moves forward to cube
+
+	MoveClaw(120); // closes claw
+
+	wait1Msec(1000); // waits until the claw pickes up the cube
+
+	int powerLift = 40;
+	MoveLift(powerLift); // lift up slightly
+	wait1Msec(500);
+
+	MoveValue(95, 120); // moves forward to the center
+	wait1Msec(globalWaiter);
+
+	MoveClaw(50); // holds the claw
+
+	angle = 450;
+	TurnValueGyro(angle, -80); // rotates to the wall
+	wait1Msec(globalWaiter);
+
+	MoveValue(60, -120); // moves to the wall
+	wait1Msec(300);
+
+	powerLift = 105;
+	LiftUpNoStop(2500, powerLift);
+	MoveClaw(-120);
+	wait1Msec(100);
+	MoveLift(0);
+	wait1Msec(300);
+	MoveClaw(-30); // opens claw
+
+	// Done the first part
+
+	powerLift = -20;
+	LiftDown(1500, powerLift); // lift down
+
+	powerLift = -15;
+	MoveLift(powerLift); // lift up slightly
+	MoveClaw(0);
+
+	MoveValue(260, 120); // moves forward to the stars
+	wait1Msec(globalWaiter);
+
+	MoveClaw(120); // closes claw
+	wait1Msec(1000); // waits until the claw pickes up the stars
+
+	MoveClaw(50); // holds the claw
+	powerLift = 50;
+	MoveLift(powerLift); // lift up slightly
+	wait1Msec(500);
+
+	MoveValue(320, -120); // moves to the wall
+	wait1Msec(300);
+
+	powerLift = 120;
+	LiftUpNoStop(2500, powerLift);
+	MoveClaw(-120);
+	wait1Msec(100);
+	MoveLift(0);
+	wait1Msec(300);
+	MoveClaw(-30); // opens claw
+
+	// try one more time to pick up the stars around the fence
 
 
+	powerLift = -20;
+	LiftDown(1500, powerLift); // lift down
+
+	powerLift = -15;
+	MoveLift(powerLift); // holds down the lift slightly
+	MoveClaw(0);
+
+	MoveValue(260, 120); // moves forward to the stars
+	wait1Msec(globalWaiter);
+
+	MoveClaw(120); // closes claw
+	wait1Msec(1000); // waits until the claw pickes up the stars
+
+	MoveClaw(10); // holds the claw
+	powerLift = 50;
+	MoveLift(powerLift); // lift up slightly
+	wait1Msec(500);
+
+	MoveValue(320, -120); // moves to the wall
+	wait1Msec(300);
+
+	powerLift = 120;
+	LiftUpNoStop(2500, powerLift);
+	MoveClaw(-120);
+	wait1Msec(100);
+	MoveLift(0);
+	wait1Msec(300);
+	MoveClaw(-30); // opens claw
+
+	//
+
+
+	powerLift = -20;
+	LiftDown(1500, powerLift); // lift down
+
+
+	MoveValue(130, 120); // moves a little bit
+
+
+	wait1Msec(1000);
+
+	angle = 1300; // 180 degree?
+	TurnValueGyro(angle, 80); // rotates to the stars on the walls
+	wait1Msec(globalWaiter);
+
+
+	MoveValue(130, 120); // moves farward to the stars on the wall
+
+
+	MoveClaw(120); // closes claw
+	wait1Msec(1000); // waits until the claw pickes up the stars
+
+
+	MoveValue(130, -120); // moves backward
+
+	powerLift = 105;
+	LiftUp(1800, powerLift);
+
+
+	angle = 1300; // 180 degree?
+	TurnValueGyro(angle, 80); // rotates to the stars on the walls
+	wait1Msec(1000);
+
+
+	MoveValue(150, -120); // moves backward
+	wait1Msec(1000);
+
+	powerLift = 120;
+	LiftUpNoStop(2500, powerLift);
+	MoveClaw(-120);
+	wait1Msec(100);
+	MoveLift(0);
+	wait1Msec(300);
+	MoveClaw(-30); // opens claw
+
+	MoveClaw(0); // opens claw
 
 }
 
@@ -318,19 +578,15 @@ task usercontrol()
 
 	while (true)
 	{
-		// This is the main execution loop for the user control program.
-		// Each time through the loop your program should update motor + servo
-		// values based on feedback from the joysticks.
-
-		// ........................................................................
-		// Insert user code here. This is where you use the joystick values to
-		// update your motors, etc.
-		// ........................................................................
-
-		// Remove this function call once you have "real" code.
-		//UserControlCodePlaceholderForTesting();
-
 		wait1Msec(50);
+
+		int btnLCD = nLCDButtons;
+		if (btnLCD > 0)
+		{
+			AutonomousSelector(btnLCD);
+			// startTask(displayBatteryLevelOnLCD);
+		}
+
 
 		if (vexRT[Btn6D] == 1)
 		{
@@ -362,6 +618,125 @@ task usercontrol()
 	}
 }
 
+
+void AutonomousSelector(int btnLCD)
+{
+	writeDebugStreamLine("AutonomousSelector) button: %d", btnLCD);
+
+	bLCDBacklight=true;
+
+	displayBatteryLevelOnLCD(autonomousMode);
+	int autonomousModeValue = autonomousMode;
+
+	int button = 0;
+	while(true)
+	{
+		button = nLCDButtons;
+
+		if (button == 2 || vexRT[Btn8L] == 1)
+		{
+			displayBatteryLevelOnLCD(autonomousModeValue);
+
+			bLCDBacklight=false;
+			break;
+		}
+		else if (button == 1 || vexRT[Btn6U] == 1)
+		{
+			if (autonomousModeValue > 1)
+			{
+				autonomousModeValue--;
+			}
+
+			DisplayAutonomousMode(autonomousModeValue);
+		}
+		else if (button == 4 || vexRT[Btn6D] == 1)
+		{
+			if (autonomousModeValue < 3)
+			{
+				autonomousModeValue++;
+			}
+
+			DisplayAutonomousMode(autonomousModeValue);
+		}
+	}
+
+	bLCDBacklight=false;
+}
+
+void DisplayAutonomousMode(int autonomousModeValue)
+{
+	writeDebugStreamLine("DisplayAutonomousMode) autonomousModeValue: %d", autonomousModeValue);
+
+	clearLCDLine(0);                                            // Clear line 1 (0) of the LCD
+	clearLCDLine(1);                                            // Clear line 2 (1) of the LCD
+
+	string text;
+	//}
+	switch(autonomousModeValue)
+	{
+	case 1:
+		{
+			text = "Autonomous";
+			break;
+		}
+	case 2:
+		{
+			text = "ProgrammingSkill";
+			break;
+		}
+	case 3:
+		{
+			text = "ProgSkill_Extended";
+			break;
+		}
+	}
+
+	//Display the Primary Robot battery voltage
+	// displayLCDString(0, 0, "Autonomous: ");
+	displayLCDString(0, 0, text);
+
+	wait1Msec(500);
+}
+
+void displayBatteryLevelOnLCD(int autonomousModeValue)
+{
+	writeDebugStreamLine("displayBatteryLevelOnLCD) autonomousModeValue: %d", autonomousModeValue);
+
+	clearLCDLine(0);                                            // Clear line 1 (0) of the LCD
+	clearLCDLine(1);                                            // Clear line 2 (1) of the LCD
+
+	autonomousMode = autonomousModeValue;
+
+	string text;
+	sprintf(text, "Selected: %d", autonomousMode); //Build the value to be displayed
+
+	//Display the Primary Robot battery voltage
+	// displayLCDString(0, 0, "Autonomous: ");
+	displayLCDString(0, 0, text);
+
+	wait1Msec(800);
+
+	//while(true)                                                        // An infinite loop to keep the program running until you terminate it
+	//{
+	clearLCDLine(0);                                            // Clear line 1 (0) of the LCD
+	clearLCDLine(1);                                            // Clear line 2 (1) of the LCD
+
+	string mainBattery, externalBattery;
+
+	//Display the Primary Robot battery voltage
+	displayLCDString(0, 0, "Primary: ");
+	sprintf(mainBattery, "%1.2f%c", nImmediateBatteryLevel/1000.0,'V'); //Build the value to be displayed
+	displayNextLCDString(mainBattery);
+
+	//float externalBatteryLevel = SensorValue[ExternalBatteryValue];
+	//Display the Backup battery voltage
+	displayLCDString(1, 0, "External: ");
+	sprintf(externalBattery, "%1.2f%c", (SensorValue[ExternalBatteryValue] * 3.57)/1000.0, 'V');    //Build the value to be displayed
+	displayNextLCDString(externalBattery);
+
+	//Short delay for the LCD refresh rate
+	wait1Msec(500);
+}
 
 int AdjustPowerUsingBatteryLevel(int originalPower)
 {
@@ -481,6 +856,10 @@ void LiftUpNoStop(int distance, int power) {
 
 	while (abs(SensorValue[LiftPosition])<abs(distance)){
 		MoveLift(power);
+		if (vexRT[Btn8L] == 1)
+		{
+			break;
+		}
 	}
 	// MoveLift(0);
 }
@@ -489,6 +868,10 @@ void LiftUp(int distance, int power) {
 
 	while (abs(SensorValue[LiftPosition])<abs(distance)){
 		MoveLift(power);
+		if (vexRT[Btn8L] == 1)
+		{
+			break;
+		}
 	}
 	MoveLift(0);
 }
@@ -497,8 +880,18 @@ void LiftDown(int distance, int power) {
 
 	while (abs(SensorValue[LiftPosition])>abs(distance)){
 		MoveLift(power);
+		if (vexRT[Btn8L] == 1)
+		{
+			break;
+		}
 	}
 	MoveLift(0);
+}
+
+float adjustValue(float value, float proportion)
+{
+	float newValue =  proportion * (value / 100);
+	return newValue;
 }
 
 task Move ()
@@ -515,6 +908,7 @@ task Move ()
 			motor[FrontRight] = -(vexRT[Ch3] - vexRT[Ch1]) - (vexRT[Btn7L] - vexRT[Btn7R]) * shiftPower;
 			motor[FrontLeft] = (vexRT[Ch3] + vexRT[Ch1]) - (vexRT[Btn7L] - vexRT[Btn7R]) * shiftPower;
 			motor[BackRight] = -(vexRT[Ch3] - vexRT[Ch1]) + (vexRT[Btn7L] - vexRT[Btn7R]) * shiftPower;
+			//motor[BackLeft] = adjustValue((vexRT[Ch3] + vexRT[Ch1]) + (vexRT[Btn7L] - vexRT[Btn7R]) * shiftPower, 95);
 			motor[BackLeft] = (vexRT[Ch3] + vexRT[Ch1]) + (vexRT[Btn7L] - vexRT[Btn7R]) * shiftPower;
 		}
 		else if (vexRT[Btn8U] == 1)
@@ -524,6 +918,11 @@ task Move ()
 				int angle = SensorValue[GyroPosition];
 				TurnValueGyro(angle, 50);
 			}
+		}
+
+		if (abs(motor[FrontRight]) < 20)
+		{
+			GoStraight(0);
 		}
 		//EndTimeSlice();
 	}
