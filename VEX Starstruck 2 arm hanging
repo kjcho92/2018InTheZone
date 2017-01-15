@@ -145,7 +145,7 @@ void Autonomous1()
 	int globalWaiter = 200;
 	//LockWheel();
 	wait1Msec(300);
-	MoveClaw(120); // closes claw
+	MoveClaw(90); // closes claw
 
 	ShiftValue(155, -120); // shifts right
 	wait1Msec(globalWaiter);
@@ -154,7 +154,7 @@ void Autonomous1()
 
 	wait1Msec(1000); // waits until the claw pickes up the cube
 
-	int powerLift = 40;
+	int powerLift = 45;
 	MoveLift(powerLift); // lift up slightly
 	wait1Msec(500);
 
@@ -163,7 +163,7 @@ void Autonomous1()
 
 	MoveClaw(10); // holds the claw
 
-	int angle = 350;
+	int angle = 325;
 	TurnValueGyro(angle, -80); // rotates to the wall
 	wait1Msec(globalWaiter);
 
@@ -172,25 +172,25 @@ void Autonomous1()
 
 	powerLift = 105;
 	LiftUpNoStop(2500, powerLift);
-	MoveClaw(-120);
+	MoveClaw(-90);
 	wait1Msec(100);
 	MoveLift(0);
 	wait1Msec(300);
-	MoveClaw(-30); // opens claw
+	MoveClaw(-35); // opens claw
 
 	// Done the first part
 
 	powerLift = -20;
 	LiftDown(1500, powerLift); // lift down
 
-	powerLift = -15;
+	powerLift = -20;
 	MoveLift(powerLift); // holds down the lift slightly
 	MoveClaw(0);
 
 	MoveValue(265, 120); // moves forward to the stars
 	wait1Msec(globalWaiter);
 
-	MoveClaw(120); // closes claw
+	MoveClaw(90); // closes claw
 	wait1Msec(1200); // waits until the claw pickes up the stars
 
 	powerLift = 50;
@@ -204,7 +204,7 @@ void Autonomous1()
 
 	powerLift = 120;
 	LiftUpNoStop(2500, powerLift);
-	MoveClaw(-120);
+	MoveClaw(-90);
 	wait1Msec(100);
 	MoveLift(0);
 	wait1Msec(300);
@@ -366,36 +366,36 @@ void ProgrammingSkill_Extended(){
 	int globalWaiter = 200;
 	//lockWheel();
 	//wait1Msec(300);
-	/*MoveClaw(120); // closes claw
+	MoveClaw(120); // closes claw
 
 	MoveValue(120, -60); //move back a bit
 	wait1Msec(500);
-	MoveClaw(0); //stop closing*/
-	for (int i = 3; i<4; i++){
+	MoveClaw(0); //stop closing
+	for (int i = 0; i < 4; i++){
 		wait1Msec(1200);
 		MoveClaw(120); //start closing
 		wait1Msec(1000);
 		int powerLift = 30;
 		MoveLift(powerLift); // lift up slightly
 		wait1Msec(500);
-		MoveClaw(20); // holds claw
+		MoveClaw(30); // holds claw
 		int goBack = 290;
-		if (i==0){
+		if (i == 0) {
 			goBack = 320;
 		}
 		MoveValue(goBack, -60); //move back to fence
 		powerLift = 105;
 		LiftUpNoStop(2500, powerLift);
 		MoveClaw(-120);
-		if (i>1){
-			wait1Msec(180 * ((i+1)/2));
+		if (i > 1){
+			wait1Msec(180 * ((i + 1) / 2));
 		}
 		else{
 			wait1Msec(200);
 		}
 		MoveLift(0);
 		wait1Msec(300);
-		MoveClaw(-30); // opens claw
+		MoveClaw(-20); // opens claw
 		powerLift = -20;
 		if (i < 3) {
 			LiftDown(1500, powerLift); // lift down
@@ -411,15 +411,20 @@ void ProgrammingSkill_Extended(){
 		}
 		MoveValue(goBackWall, 60); //move back to wall
 	}
-	int powerLift = -40;
-	MoveClaw(30);
-	wait1Msec(600);
-	MoveClaw(0);
+	MoveClaw(50);
 	wait1Msec(1000);
-	TurnValueGyro(270, 80);
+	MoveClaw(0);
+	int powerLift = -40;
+	wait1Msec(1000);
+	MoveValue(25, 60);
+	TurnValueGyro(250, 80);
 	LiftDown(1500, powerLift);
 	wait1Msec(globalWaiter);
+	MoveClaw(-40);
+	wait1Msec(1000);
+	MoveClaw(0);
 	MoveValue(350, 120); // moves forward to stars
+	wait1Msec(500);
 	MoveClaw(120); // closes claw
 	wait1Msec(500);
 	MoveClaw(50);
@@ -479,7 +484,7 @@ void ProgrammingSkill_Extended(){
 	wait1Msec(300);
 	MoveClaw(-30); // opens claw
 
-  
+
 	/*int angle = 300;
 	TurnValueGyro(angle, 80); // rotates to the center cube
 	wait1Msec(globalWaiter);
