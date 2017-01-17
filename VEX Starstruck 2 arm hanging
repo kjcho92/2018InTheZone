@@ -677,7 +677,7 @@ task usercontrol()
 			// Closes claw
 			MoveClaw(100);
 			wait1Msec(120);
-			MoveClaw(15);
+			MoveClaw(30);
 		}
 		if (vexRT[Btn8D] == 1)
 		{
