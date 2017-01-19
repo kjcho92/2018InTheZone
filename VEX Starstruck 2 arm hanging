@@ -1,6 +1,6 @@
 #pragma config(I2C_Usage, I2C1, i2cSensors)
 #pragma config(Sensor, in1,    GyroPosition,   sensorGyro)
-#pragma config(Sensor, in3,    LiftPosition,           sensorPotentiometer)
+#pragma config(Sensor, in3,    LiftPosition,   sensorPotentiometer)
 #pragma config(Sensor, in8,    ExternalBatteryValue, sensorAnalog)
 #pragma config(Sensor, I2C_1,  Wheel,          sensorQuadEncoderOnI2CPort,    , AutoAssign )
 #pragma config(Motor,  port1,           ClawRight,     tmotorVex393_HBridge, openLoop)
@@ -43,9 +43,11 @@
 task Move();
 task Lift();
 task Hang();
+task StopAll();
+
 
 // Autonomous
-int autonomousMode = 3;
+int autonomousMode = 1;
 void DisplayAutonomousMode(int autonomousModeValue);
 void displayBatteryLevelOnLCD(int autonomousModeValue);
 void AutonomousSelector(int btnLCD);
@@ -67,7 +69,7 @@ void Shift(int power);
 void ShiftValue(int distance, int power);
 void LockWheel();
 
-float adjustValue(float value, float proportion);
+//float adjustValue(float value, float proportion);
 int AdjustPowerUsingBatteryLevel(int originalPower);
 
 
@@ -83,6 +85,9 @@ void pre_auton()
 	// manage all user created tasks if set to false.
 	bStopTasksBetweenModes = true;
 
+	//slaveMotor(port6, port7);
+	//slaveMotor(port8, port7);
+	//slaveMotor(port9, port7);
 
 	SensorValue[GyroPosition] = 0;
 	nMotorEncoder[FrontRight] = 0;
@@ -110,6 +115,8 @@ task autonomous()
 {
 	long startTime = nPgmTime;
 
+	SensorValue[GyroPosition] = 0;
+	nMotorEncoder[FrontRight] = 0;
 
 	if (autonomousMode == 1)
 	{
@@ -431,7 +438,7 @@ void ProgrammingSkill_Extended(){
 	powerLift = 50;
 	LiftUp(1500, powerLift);
 	powerLift = 35;
-  MoveLift(powerLift);
+	MoveLift(powerLift);
 	TurnValueGyro(350, -80);
 	powerLift = 105;
 	LiftUpNoStop(2500, powerLift);
@@ -652,6 +659,7 @@ task usercontrol()
 	startTask (Move);
 	startTask (Lift);
 	startTask (Hang);
+	startTask (StopAll);
 
 	while (true)
 	{
@@ -675,23 +683,15 @@ task usercontrol()
 		if (vexRT[Btn6U] == 1)
 		{
 			// Closes claw
+			if ((SensorValue[LiftPosition]) < 1300)
+			{
+				int powerLift = -20;
+				MoveLift(powerLift);
+			}
 			MoveClaw(100);
 			wait1Msec(120);
 			MoveClaw(30);
 		}
-		if (vexRT[Btn8D] == 1)
-		{
-			SensorValue[GyroPosition] = 0;
-		}
-		if (vexRT[Btn8L] == 1)
-		{
-			// Stops everything
-			int power = 0;
-			MoveLift(power);
-			MoveHanging(power);
-			MoveClaw(power);
-		}
-
 	}
 }
 
@@ -824,6 +824,22 @@ int AdjustPowerUsingBatteryLevel(int originalPower)
 	return adjustedPower;
 }
 
+task StopAll ()
+{
+	while (true)
+	{
+		wait1Msec(50);
+
+		if (vexRT[Btn8L] == 1)
+		{
+			// Stops everything
+			int power = 0;
+			MoveLift(power);
+			MoveHanging(power);
+			MoveClaw(power);
+		}
+	}
+}
 
 task Hang ()
 {
@@ -882,7 +898,7 @@ task Lift ()
 			if (vexRT[Btn7U] == 1)
 			{
 				// Up lift
-				int powerLift = 90;
+				int powerLift = 120;
 				MoveLift(powerLift);
 			}
 			if (vexRT[Btn7D] == 1)
@@ -919,7 +935,39 @@ task Lift ()
 			if (vexRT[Btn7D] == 1)
 			{
 				int powerLift = -20;
-				LiftDown(1500, powerLift);
+				LiftDown(1160, powerLift);
+
+				// Down lift
+				// Lift(powerLift);
+			}
+			if (vexRT[Btn7R] == 1)
+			{
+				// Set position to knock down stars
+				int position = 1730;
+				if ((SensorValue[LiftPosition]) < position)
+				{
+					// Up
+					int powerLift = 35;
+					LiftUp(position, powerLift);
+				}
+				else
+				{
+					// Down
+					int powerLift = -20;
+					LiftDown(position, powerLift);
+				}
+				// Down lift
+				// Lift(powerLift);
+			}
+			if (vexRT[Btn7L] == 1)
+			{
+				// Up
+
+				MoveClaw(100);
+				wait1Msec(250);
+
+				int powerLift = 25;
+				MoveLift(powerLift);
 
 				// Down lift
 				// Lift(powerLift);
@@ -965,11 +1013,11 @@ void LiftDown(int distance, int power) {
 	MoveLift(0);
 }
 
-float adjustValue(float value, float proportion)
-{
-	float newValue =  proportion * (value / 100);
-	return newValue;
-}
+//float adjustValue(float value, float proportion)
+//{
+//	float newValue =  proportion * (value / 100);
+//	return newValue;
+//}
 
 task Move ()
 {
@@ -988,14 +1036,14 @@ task Move ()
 			//motor[BackLeft] = adjustValue((vexRT[Ch3] + vexRT[Ch1]) + (vexRT[Btn7L] - vexRT[Btn7R]) * shiftPower, 95);
 			motor[BackLeft] = (vexRT[Ch3] + vexRT[Ch1]) + (vexRT[Btn7L] - vexRT[Btn7R]) * shiftPower;
 		}
-		else if (vexRT[Btn8U] == 1)
-		{
-			if (vexRT[Btn7R] == 1)
-			{
-				int angle = SensorValue[GyroPosition];
-				TurnValueGyro(angle, 50);
-			}
-		}
+		// else if (vexRT[Btn8U] == 1)
+		// {
+		// 	if (vexRT[Btn7R] == 1)
+		// 	{
+		// 		int angle = SensorValue[GyroPosition];
+		// 		TurnValueGyro(angle, 50);
+		// 	}
+		// }
 
 		if (abs(motor[FrontRight]) < 20)
 		{
