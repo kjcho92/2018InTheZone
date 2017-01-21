@@ -47,7 +47,7 @@ task StopAll();
 
 
 // Autonomous
-int autonomousMode = 1;
+int autonomousMode = 3;
 void DisplayAutonomousMode(int autonomousModeValue);
 void displayBatteryLevelOnLCD(int autonomousModeValue);
 void AutonomousSelector(int btnLCD);
@@ -150,31 +150,31 @@ void Autonomous1()
 
 	//Auton
 	int globalWaiter = 200;
-	//LockWheel();
+	LockWheel();
 	wait1Msec(300);
-	MoveClaw(90); // closes claw
+	MoveClaw(75); // closes claw
 
 	ShiftValue(155, -120); // shifts right
 	wait1Msec(globalWaiter);
 
-	MoveValue(120, 120); // moves forward to cube
+	MoveValue(130, 120); // moves forward to cube
 
-	wait1Msec(1000); // waits until the claw pickes up the cube
+	wait1Msec(800); // waits until the claw pickes up the cube
 
-	int powerLift = 45;
+	int powerLift = 50;
 	MoveLift(powerLift); // lift up slightly
-	wait1Msec(500);
+	wait1Msec(800);
 
 	MoveValue(95, 120); // moves forward to the center
 	wait1Msec(globalWaiter);
 
 	MoveClaw(10); // holds the claw
 
-	int angle = 325;
+	int angle = 275;
 	TurnValueGyro(angle, -80); // rotates to the wall
 	wait1Msec(globalWaiter);
 
-	MoveValue(110, -120); // moves to the wall
+	MoveValue(110, -120); // moves to the fence
 	wait1Msec(300);
 
 	powerLift = 105;
@@ -185,6 +185,9 @@ void Autonomous1()
 	wait1Msec(300);
 	MoveClaw(-35); // opens claw
 
+	angle = 36;
+	TurnValueGyro(angle, 30); // rotates a bit
+	wait1Msec(globalWaiter);
 	// Done the first part
 
 	powerLift = -20;
@@ -192,14 +195,18 @@ void Autonomous1()
 
 	powerLift = -20;
 	MoveLift(powerLift); // holds down the lift slightly
-	MoveClaw(0);
+	MoveClaw(-20);
+	wait1Msec(500);
 
 	MoveValue(265, 120); // moves forward to the stars
-	wait1Msec(globalWaiter);
+	wait1Msec(800);
 
 	MoveClaw(90); // closes claw
-	wait1Msec(1200); // waits until the claw pickes up the stars
-
+	wait1Msec(1000); // waits until the claw pickes up the stars
+	MoveClaw(-90);
+	wait1Msec(500);
+	MoveClaw(90);
+	wait1Msec(900);
 	powerLift = 50;
 	MoveLift(powerLift); // lift up slightly
 	wait1Msec(500);
@@ -376,6 +383,9 @@ void ProgrammingSkill_Extended(){
 	MoveClaw(120); // closes claw
 
 	MoveValue(120, -60); //move back a bit
+	MoveClaw(0);
+	wait1Msec(500);
+	MoveClaw(120);
 	wait1Msec(500);
 	MoveClaw(0); //stop closing
 	for (int i = 0; i < 4; i++){
@@ -385,7 +395,7 @@ void ProgrammingSkill_Extended(){
 		int powerLift = 30;
 		MoveLift(powerLift); // lift up slightly
 		wait1Msec(500);
-		MoveClaw(30); // holds claw
+		MoveClaw(40); // holds claw
 		int goBack = 290;
 		if (i == 0) {
 			goBack = 320;
@@ -850,6 +860,21 @@ task Hang ()
 
 		if (vexRT[Btn8U] == 1)
 		{
+			if (vexRT[Btn6D] == 1)
+			{
+				// Movies up hanging
+				int powerHang = 127;
+				MoveHanging(powerHang);
+				wait1Msec(1500);
+				powerHang = 50;
+				MoveHanging(powerHang);
+				wait1Msec(300);
+				MoveHanging(0);
+
+			}
+		}
+		if (vexRT[Btn8U] == 1)
+		{
 
 			if (vexRT[Btn5U] == 1 && vexRT[Btn5D] == 0)
 			{
@@ -929,7 +954,7 @@ task Lift ()
 			if (vexRT[Btn7U] == 1)
 			{
 				// Up lift
-				
+
 				int powerLift = 120;
 				MoveLift(powerLift);
 
