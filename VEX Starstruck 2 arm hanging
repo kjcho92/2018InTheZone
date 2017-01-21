@@ -898,8 +898,20 @@ task Lift ()
 			if (vexRT[Btn7U] == 1)
 			{
 				// Up lift
+				// int powerLift = 120;
+				// LiftUp(2800, powerLift);
+				// MoveClaw(-120);
+				// wait1Msec(500);
+				// MoveClaw(0);
+
 				int powerLift = 120;
-				MoveLift(powerLift);
+				LiftUpNoStop(2500, powerLift);
+				MoveClaw(-120);
+				wait1Msec(100);
+				MoveLift(0);
+				wait1Msec(300);
+				MoveClaw(0);
+
 			}
 			if (vexRT[Btn7D] == 1)
 			{
@@ -917,19 +929,9 @@ task Lift ()
 			if (vexRT[Btn7U] == 1)
 			{
 				// Up lift
-				// int powerLift = 120;
-				// LiftUp(2800, powerLift);
-				// MoveClaw(-120);
-				// wait1Msec(500);
-				// MoveClaw(0);
-
+				
 				int powerLift = 120;
-				LiftUpNoStop(2500, powerLift);
-				MoveClaw(-120);
-				wait1Msec(100);
-				MoveLift(0);
-				wait1Msec(300);
-				MoveClaw(0);
+				MoveLift(powerLift);
 
 			}
 			if (vexRT[Btn7D] == 1)
@@ -966,9 +968,13 @@ task Lift ()
 				MoveClaw(100);
 				wait1Msec(250);
 
-				int powerLift = 25;
+				int powerLift = 45;
 				MoveLift(powerLift);
 
+				wait1Msec(350);
+
+				MoveClaw(0);
+				MoveLift(0);
 				// Down lift
 				// Lift(powerLift);
 			}
