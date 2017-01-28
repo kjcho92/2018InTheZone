@@ -49,7 +49,7 @@ task StopAll();
 // Autonomous
 int globalHoldLiftUp = 45;
 int globalHoldLiftDown = -30;
-int autonomousMode = 3;
+int autonomousMode = 1;
 void DisplayAutonomousMode(int autonomousModeValue);
 void displayBatteryLevelOnLCD(int autonomousModeValue);
 void AutonomousSelector(int btnLCD);
@@ -126,7 +126,8 @@ task autonomous()
 	}
 	else if (autonomousMode == 2)
 	{
-		ProgrammingSkill();
+
+		//ProgrammingSkill();
 	}
 	else if (autonomousMode == 3)
 	{
@@ -138,6 +139,7 @@ task autonomous()
 	}
 
 	writeDebugStreamLine("autonomous) Time: %d", nPgmTime - startTime);
+
 }
 
 
@@ -158,26 +160,26 @@ void Autonomous1()
 	wait1Msec(300);
 	MoveClaw(47); // closes claw
 
-	ShiftValue(155, -120); // shifts right
+	ShiftValue(280, -120); // shifts right
 	wait1Msec(globalWaiter);
 
-	MoveValue(130, 120); // moves forward to cube
+	MoveValue(300, 120); // moves forward to cube
 	MoveClaw(120);
 	wait1Msec(800); // waits until the claw pickes up the cube
 
 	MoveLift(globalHoldLiftUp); // lift up slightly
 	wait1Msec(800);
 
-	MoveValue(95, 120); // moves forward to the center
+	MoveValue(155, 120); // moves forward to the center
 	wait1Msec(globalWaiter);
 
 	MoveClaw(10); // holds the claw
 
-	int angle = 275;
+	int angle = 350;
 	TurnValueGyro(angle, -80); // rotates to the wall
 	wait1Msec(globalWaiter);
 
-	MoveValue(110, -120); // moves to the fence
+	MoveValue(200, -120); // moves to the fence
 	wait1Msec(300);
 
 	int powerLift = 105;
@@ -200,7 +202,7 @@ void Autonomous1()
 	MoveClaw(-20);
 	wait1Msec(globalWaiter);
 
-	MoveValue(265, 120); // moves forward to the stars
+	MoveValue(450, 120); // moves forward to the stars
 	wait1Msec(500);
 
 	MoveClaw(120); // closes claw
@@ -212,16 +214,16 @@ void Autonomous1()
 	wait1Msec(500);
 	MoveClaw(0);
 
-	MoveValue(30, 80); // moves to the stars
+	MoveValue(75, 80); // moves to the stars
 
 	MoveClaw(120);
 	wait1Msec(900);
 	MoveLift(globalHoldLiftUp); // lift up slightly
 	wait1Msec(500);
 
-	MoveClaw(30); // holds the claw
+	MoveClaw(60); // holds the claw
 
-	MoveValue(300, -120); // moves to the wall
+	MoveValue(480, -120); // moves to the wall
 	wait1Msec(300);
 
 	powerLift = 120;
@@ -764,14 +766,20 @@ task usercontrol()
 		if (vexRT[Btn6D] == 1)
 		{
 			// Opens claw
+			if ((SensorValue[LiftPosition]) < 1500)
+			{
+				int powerLift = -20;
+				MoveLift(powerLift);
+			}
 			MoveClaw(-120);
 			wait1Msec(100);
 			MoveClaw(0);
+
 		}
 		if (vexRT[Btn6U] == 1)
 		{
 			// Closes claw
-			if ((SensorValue[LiftPosition]) < 1300)
+			if ((SensorValue[LiftPosition]) < 1500)
 			{
 				int powerLift = -20;
 				MoveLift(powerLift);
@@ -846,7 +854,8 @@ void DisplayAutonomousMode(int autonomousModeValue)
 		}
 	case 2:
 		{
-			text = "ProgrammingSkill";
+			//text = "ProgrammingSkill";
+			text = "None";
 			break;
 		}
 	case 3:
@@ -943,10 +952,14 @@ task Hang ()
 				// Movies up hanging
 				int powerHang = 127;
 				MoveHanging(powerHang);
-				wait1Msec(1500);
+				wait1Msec(700);
+				MoveHanging(-30);
+				wait1Msec(200);
+				MoveHanging(powerHang);
+				wait1Msec(1000);
 				powerHang = 50;
 				MoveHanging(powerHang);
-				wait1Msec(300);
+				wait1Msec(380);
 				MoveHanging(0);
 
 			}
@@ -991,8 +1004,14 @@ task Lift ()
 		if (vexRT[Btn8R] == 1)
 		{
 			// Up slowly lift
-			int powerLift = 35;
-			MoveLift(powerLift);
+			int powerLift = 65;
+			while (SensorValue(LiftPosition)<1600/*&&(vexRT[Btn7U]==0)*/){
+				//if (vexRT[Btn7U]==1){
+				//	MoveLift(100);
+				//}
+				MoveLift(powerLift);
+			}
+			MoveLift(20);
 		}
 
 		if (vexRT[Btn8U] == 0)
@@ -1009,7 +1028,7 @@ task Lift ()
 
 				int powerLift = 120;
 				LiftUpNoStop(2500, powerLift);
-				MoveClaw(-120);
+				MoveClaw(-50);
 				wait1Msec(100);
 				MoveLift(0);
 				wait1Msec(300);
@@ -1019,9 +1038,14 @@ task Lift ()
 			if (vexRT[Btn7D] == 1)
 			{
 				// Down lift
-				int powerLift = -50;
+				int powerLift = -55;
 				MoveLift(powerLift);
 				wait1Msec(50);
+				if ((SensorValue[LiftPosition]) < 1500)
+				{
+					int powerLift = -20;
+					MoveLift(powerLift);
+				}
 				MoveLift(-10);
 			}
 		}
@@ -1039,8 +1063,13 @@ task Lift ()
 			}
 			if (vexRT[Btn7D] == 1)
 			{
-				int powerLift = -20;
+				int powerLift = -38;
 				LiftDown(1160, powerLift);
+				if ((SensorValue[LiftPosition]) < 1500)
+				{
+					int powerLift = -20;
+					MoveLift(powerLift);
+				}
 
 				// Down lift
 				// Lift(powerLift);
