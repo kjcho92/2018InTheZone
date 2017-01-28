@@ -91,6 +91,17 @@ void pre_auton()
 	//slaveMotor(port8, port7);
 	//slaveMotor(port9, port7);
 
+	//SensorType[GyroPosition] = sensorNone;
+	//wait1Msec(1000);
+	////Reconfigure Analog Port 8 as a Gyro sensor and allow time for ROBOTC to calibrate it
+	//SensorType[GyroPosition] = sensorGyro;
+	//wait1Msec(2000);
+
+	// SensorScale[GyroPosition] = 260;
+	// SensorScale[GyroPosition] = 100;
+	//Adjust SensorFullCount to set the "rollover" point. 3600 sets the rollover point to +/-3600
+	SensorFullCount[GyroPosition] = 3600;
+
 	SensorValue[GyroPosition] = 0;
 	nMotorEncoder[FrontRight] = 0;
 
@@ -209,6 +220,8 @@ void Autonomous1()
 	wait1Msec(1000); // waits until the claw pickes up the stars
 
 	MoveValue(50, -80); // moves back
+
+	
 
 	MoveClaw(-90);
 	wait1Msec(500);
@@ -784,9 +797,9 @@ task usercontrol()
 				int powerLift = -20;
 				MoveLift(powerLift);
 			}
-			MoveClaw(100);
+			MoveClaw(120);
 			wait1Msec(120);
-			MoveClaw(30);
+			MoveClaw(39);
 		}
 	}
 }
@@ -1163,6 +1176,8 @@ task Move ()
 	{
 		wait1Msec(50);
 
+		//int currentValue = SensorValue[GyroPosition];
+		SensorValue[GyroPosition] = 0;
 
 		if (vexRT[Btn8U] == 0)
 		{
@@ -1173,17 +1188,51 @@ task Move ()
 			motor[BackRight] = -(vexRT[Ch3] - vexRT[Ch1]) + (vexRT[Btn7L] - vexRT[Btn7R]) * shiftPower;
 			//motor[BackLeft] = adjustValue((vexRT[Ch3] + vexRT[Ch1]) + (vexRT[Btn7L] - vexRT[Btn7R]) * shiftPower, 95);
 			motor[BackLeft] = (vexRT[Ch3] + vexRT[Ch1]) + (vexRT[Btn7L] - vexRT[Btn7R]) * shiftPower;
-		}
-		// else if (vexRT[Btn8U] == 1)
-		// {
-		// 	if (vexRT[Btn7R] == 1)
-		// 	{
-		// 		int angle = SensorValue[GyroPosition];
-		// 		TurnValueGyro(angle, 50);
-		// 	}
-		// }
 
-		if (abs(motor[FrontRight]) < 20)
+			/*
+			int p_FrontRight = -(vexRT[Ch3] - vexRT[Ch1]) - (vexRT[Btn7L] - vexRT[Btn7R]) * shiftPower;
+			int p_FrontLeft = (vexRT[Ch3] + vexRT[Ch1]) - (vexRT[Btn7L] - vexRT[Btn7R]) * shiftPower;
+			int p_BackRight = -(vexRT[Ch3] - vexRT[Ch1]) + (vexRT[Btn7L] - vexRT[Btn7R]) * shiftPower;
+			//motor[BackLeft] = adjustValue((vexRT[Ch3] + vexRT[Ch1]) + (vexRT[Btn7L] - vexRT[Btn7R]) * shiftPower, 95);
+			int p_BackLeft = (vexRT[Ch3] + vexRT[Ch1]) + (vexRT[Btn7L] - vexRT[Btn7R]) * shiftPower;
+
+
+
+			if (abs(p_FrontRight) > 30)
+			{
+			motor[FrontRight] = p_FrontRight;
+			motor[FrontLeft] = p_FrontLeft;
+			motor[BackRight] = p_BackRight;
+			motor[BackLeft] = p_BackLeft;
+
+			wait1Msec(200);
+
+			int p = 0;
+			motor[FrontRight] = p;
+			motor[FrontLeft] = p;
+			motor[BackRight] = p;
+			motor[BackLeft] = p;
+
+			// int angle = SensorValue[GyroPosition];
+			// if (abs(angle) > 200)
+			// {
+			// 	TurnValueGyro(angle, 50);
+			// }
+			}
+			*/
+		}
+
+		if (vexRT[Btn5U] == 1)
+		{
+			// if (vexRT[Btn7R] == 1)
+			// {
+			//int angle = SensorValue[GyroPosition];
+			int angle = 900;
+			TurnValueGyro(angle, 50);
+			// }
+		}
+
+		if (abs(motor[FrontRight]) < 25)
 		{
 			GoStraight(0);
 		}
