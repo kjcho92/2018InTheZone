@@ -48,8 +48,8 @@ task StopAll();
 
 // Autonomous
 int globalHoldLiftUp = 45;
-int globalHoldLiftDown = -50;
-int autonomousMode = 3;
+int globalHoldLiftDown = -40;
+int autonomousMode = 1;
 void DisplayAutonomousMode(int autonomousModeValue);
 void displayBatteryLevelOnLCD(int autonomousModeValue);
 void AutonomousSelector(int btnLCD);
@@ -397,7 +397,205 @@ void ProgrammingSkill(){
 
 }
 
+
 void ProgrammingSkill_Extended(){
+	int globalWaiter = 200;
+	int powerLift = 0;
+	int goBack = 500;
+	int localoldLiftDown = -20;
+	int powerThrow = 75;
+	int distanceLift = 2400;
+
+	LockWheel();
+
+	MoveLift(globalHoldLiftDown); // holds down the lift slightly
+
+	MoveValue(180, -60); //move back a bit
+
+	wait1Msec(1000);
+	MoveClaw(50); // closes claw
+
+	// MoveClaw(0);
+	// wait1Msec(500);
+	// MoveValue(100, -60); //move forward a bit
+	// MoveClaw(120); // closes claw
+	// wait1Msec(500);
+	// MoveClaw(0); //stop closing
+	// MoveLift(globalHoldLiftDown); // holds down the lift slightly
+
+	for (int i = 0; i < 4; i++){
+		wait1Msec(1000);
+
+		// wait1Msec(1200);
+		MoveClaw(120); //start closing
+		wait1Msec(1000);
+		// if (i == 0) {
+		// 	MoveValue(50, -60); //move back a bit
+		// }
+
+		MoveClaw(50); // holds claw
+		GoStraight(-60);
+
+			//while (SensorValue(LiftPosition) < 1300/*&&(vexRT[Btn7U]==0)*/){
+				//if (vexRT[Btn7U]==1){
+				//	MoveLift(100);
+				//}
+		MoveLift(globalHoldLiftUp);
+			// }
+		wait1Msec(500);
+		goBack = 470;
+
+		MoveValue(goBack, -60); //move back to fence
+
+		LiftUpNoStop(distanceLift, powerThrow); // throw
+		MoveClaw(-35); // claw opens too wide?
+		wait1Msec(400);
+		MoveLift(0);
+		wait1Msec(300);
+
+		MoveClaw(-20); // opens claw
+		if (i < 3) {
+			LiftDown(1500, localoldLiftDown); // lift down
+			MoveLift(localoldLiftDown); // holds down the lift slightly
+		}
+		wait1Msec(700);
+		MoveClaw(0);
+		int goBackWall = 500;
+		if (i == 3) {
+			goBackWall = 0;
+		}
+		MoveValue(goBackWall, 60); //move back to wall
+	}
+
+	wait1Msec(1000);
+
+	MoveClaw(50); // close claw
+	wait1Msec(800);
+	MoveClaw(0);
+
+	MoveValue(190, 40); //move forward so that we don't hit the fence post
+	wait1Msec(1000);
+	TurnValueGyro(460, 40); //90 degrees is around 440
+	wait1Msec(1000);
+
+	MoveValue(45, -80); // moves back
+	wait1Msec(1000);
+
+	LiftDown(1300, localoldLiftDown); // lift down
+
+	MoveLift(localoldLiftDown); // hold lift down
+
+	wait1Msec(1000);
+
+	MoveClaw(-35); // open claw
+	wait1Msec(400);
+	// MoveClaw(-25); // hold claw
+
+	MoveValue(700, 120); // moves forward to stars
+	MoveClaw(120);
+	wait1Msec(800); // waits until the claw pickes up the stars
+
+
+	MoveLift(globalHoldLiftUp); // lift up slightly
+
+	MoveClaw(40); // holds the claw
+
+	wait1Msec(800);
+
+
+	// MoveLift(globalHoldLiftUp - 10); // lift up slightly
+
+	// wait1Msec(100);
+
+
+	int angle = 650;
+	TurnValueGyro(angle, -70); // rotates to the wall
+	wait1Msec(1000);
+
+
+	MoveValue(150, -60);  // moves to the fence // if we throw too early? shorten the distance
+	wait1Msec(300);
+
+	LiftUpNoStop(distanceLift + 100, powerThrow + 30); // throw stars
+	MoveClaw(-90);
+	wait1Msec(100);
+	MoveLift(0);
+	wait1Msec(300);
+	MoveClaw(-25); // opens claw
+
+	LiftDown(1500, globalHoldLiftDown); // lift down
+
+	MoveLift(globalHoldLiftDown); // holds down the lift slightly
+	MoveClaw(-20);
+	wait1Msec(globalWaiter);
+
+
+
+	MoveValue(300, 70); // moves forward to cube
+	MoveClaw(120);
+	wait1Msec(800); // waits until the claw pickes up the cube
+
+	MoveLift(globalHoldLiftUp); // lift up slightly
+	wait1Msec(800);
+
+	MoveClaw(10); // holds the claw
+
+	MoveValue(200, -120); // moves to the fence
+	wait1Msec(300);
+
+	LiftUpNoStop(distanceLift, powerThrow); // throw cube
+
+	MoveClaw(-90);
+	wait1Msec(100);
+	MoveLift(0);
+	wait1Msec(300);
+	MoveClaw(-25); // opens claw
+
+
+	powerLift = -30;
+	LiftDown(1500, powerLift); // lift down
+
+	MoveLift(globalHoldLiftDown); // holds down the lift slightly
+	MoveClaw(-20);
+	wait1Msec(globalWaiter);
+
+	MoveValue(450, 120); // moves forward to the stars
+	wait1Msec(500);
+
+	MoveClaw(120); // closes claw
+	wait1Msec(1000); // waits until the claw pickes up the stars
+
+	MoveValue(50, -80); // moves bac
+
+	MoveClaw(-90);
+	wait1Msec(500);
+	MoveClaw(0);
+
+	MoveValue(75, 80); // moves to the stars
+
+	MoveClaw(120);
+	wait1Msec(900);
+	MoveLift(globalHoldLiftUp); // lift up slightly
+	wait1Msec(500);
+
+	MoveClaw(60); // holds the claw
+
+	MoveValue(480, -120); // moves to the wall
+	wait1Msec(300);
+
+	powerLift = 120;
+	LiftUpNoStop(2500, powerLift);
+	MoveClaw(-90);
+	wait1Msec(100);
+	MoveLift(0);
+	wait1Msec(300);
+	MoveClaw(0); // opens claw
+
+
+
+}
+
+void ProgrammingSkill_Extended_1(){
 	int globalWaiter = 200;
 	LockWheel();
 
@@ -408,7 +606,8 @@ void ProgrammingSkill_Extended(){
 	MoveValue(200, -60); //move back a bit
 	MoveClaw(0);
 	wait1Msec(500);
-	MoveClaw(120);
+	MoveValue(100, -60); //move forward a bit
+	MoveClaw(120); // closes claw
 	wait1Msec(500);
 	MoveClaw(0); //stop closing
 	int powerLift = 0;
@@ -416,20 +615,20 @@ void ProgrammingSkill_Extended(){
 		wait1Msec(1200);
 		MoveClaw(120); //start closing
 		wait1Msec(1000);
-		if (i == 0) {
-			MoveValue(60, -60); //move back a bit
-		}
+		// if (i == 0) {
+		// 	MoveValue(50, -60); //move back a bit
+		// }
 		GoStraight(-60);
 		powerLift = 50;
-			while (SensorValue(LiftPosition) < 1300/*&&(vexRT[Btn7U]==0)*/){
+			//while (SensorValue(LiftPosition) < 1300/*&&(vexRT[Btn7U]==0)*/){
 				//if (vexRT[Btn7U]==1){
 				//	MoveLift(100);
 				//}
-				MoveLift(powerLift);
-			}
+		MoveLift(powerLift);
+			// }
 		wait1Msec(500);
-		MoveClaw(40); // holds claw
-		int goBack = 200;
+		MoveClaw(50); // holds claw
+		int goBack = 300;
 		if (i == 0) {
 			goBack = 325;
 		}
@@ -441,9 +640,9 @@ void ProgrammingSkill_Extended(){
 		if (i == 0) {
 			powerLift = 70;
 		}
-		int distanceLift = 2200;
+		int distanceLift = 2500;
 		if (i == 0) {
-			distanceLift = 1600;
+			// distanceLift = 2000;
 		}
 		LiftUpNoStop(distanceLift, powerLift);
 		MoveClaw(-35); // claw opens too wide?
@@ -451,7 +650,7 @@ void ProgrammingSkill_Extended(){
 			wait1Msec(180 * ((i + 1) / 2));
 		}
 		else{
-			wait1Msec(300);
+			wait1Msec(400);
 		}
 		MoveLift(0);
 		wait1Msec(300);
@@ -463,7 +662,7 @@ void ProgrammingSkill_Extended(){
 		}
 		wait1Msec(700);
 		MoveClaw(0);
-		int goBackWall = 500;		
+		int goBackWall = 500;
 		if (i == 3) {
 			goBackWall = 0;
 		}
@@ -488,7 +687,7 @@ void ProgrammingSkill_Extended(){
 	LiftDown(1300, powerLift); // lift down
 	powerLift = -20;
 	MoveLift(powerLift);
-	
+
 	wait1Msec(1000);
 
 	MoveClaw(-35); // open claw
