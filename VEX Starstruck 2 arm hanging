@@ -48,8 +48,8 @@ task StopAll();
 
 // Autonomous
 int globalHoldLiftUp = 45;
-int globalHoldLiftDown = -30;
-int autonomousMode = 1;
+int globalHoldLiftDown = -50;
+int autonomousMode = 3;
 void DisplayAutonomousMode(int autonomousModeValue);
 void displayBatteryLevelOnLCD(int autonomousModeValue);
 void AutonomousSelector(int btnLCD);
@@ -201,12 +201,12 @@ void Autonomous1()
 	wait1Msec(300);
 	MoveClaw(-25); // opens claw
 
-	angle = 36;
-	TurnValueGyro(angle, 30); // rotates a bit
-	wait1Msec(globalWaiter);
+	/*angle = 30;
+	TurnValueGyro(angle, -30); // rotates a bit
+	wait1Msec(globalWaiter);*/
 	// Done the first part
 
-	powerLift = -20;
+	powerLift = -30;
 	LiftDown(1500, powerLift); // lift down
 
 	MoveLift(globalHoldLiftDown); // holds down the lift slightly
@@ -219,9 +219,7 @@ void Autonomous1()
 	MoveClaw(120); // closes claw
 	wait1Msec(1000); // waits until the claw pickes up the stars
 
-	MoveValue(50, -80); // moves back
-
-	
+	MoveValue(50, -80); // moves bac
 
 	MoveClaw(-90);
 	wait1Msec(500);
@@ -407,7 +405,7 @@ void ProgrammingSkill_Extended(){
 	wait1Msec(300);
 	MoveClaw(120); // closes claw
 
-	MoveValue(120, -60); //move back a bit
+	MoveValue(200, -60); //move back a bit
 	MoveClaw(0);
 	wait1Msec(500);
 	MoveClaw(120);
@@ -418,21 +416,37 @@ void ProgrammingSkill_Extended(){
 		wait1Msec(1200);
 		MoveClaw(120); //start closing
 		wait1Msec(1000);
-		// int powerLift = 30;
-		MoveLift(globalHoldLiftUp - 15); // lift up slightly
+		if (i == 0) {
+			MoveValue(60, -60); //move back a bit
+		}
+		GoStraight(-60);
+		powerLift = 50;
+			while (SensorValue(LiftPosition) < 1300/*&&(vexRT[Btn7U]==0)*/){
+				//if (vexRT[Btn7U]==1){
+				//	MoveLift(100);
+				//}
+				MoveLift(powerLift);
+			}
 		wait1Msec(500);
 		MoveClaw(40); // holds claw
-		int goBack = 330;
+		int goBack = 200;
 		if (i == 0) {
-			goBack = 450;
+			goBack = 325;
 		}
-		else if (i == 3) {
-			goBack = 370;
-		}
+		/*else if (i == 3) {
+			goBack = 400;
+		}*/
 		MoveValue(goBack, -60); //move back to fence
-		powerLift = 105;
-		LiftUpNoStop(2500, powerLift);
-		MoveClaw(-30); // claw opens too wide?
+		powerLift = 78;
+		if (i == 0) {
+			powerLift = 70;
+		}
+		int distanceLift = 2200;
+		if (i == 0) {
+			distanceLift = 1600;
+		}
+		LiftUpNoStop(distanceLift, powerLift);
+		MoveClaw(-35); // claw opens too wide?
 		if (i > 1){
 			wait1Msec(180 * ((i + 1) / 2));
 		}
@@ -449,11 +463,8 @@ void ProgrammingSkill_Extended(){
 		}
 		wait1Msec(700);
 		MoveClaw(0);
-		int goBackWall = 300;
-		if (i==0){
-			goBackWall = 320;
-		}
-		else if (i == 3) {
+		int goBackWall = 500;		
+		if (i == 3) {
 			goBackWall = 0;
 		}
 		MoveValue(goBackWall, 60); //move back to wall
@@ -465,23 +476,26 @@ void ProgrammingSkill_Extended(){
 	// wait1Msec(10000);
 
 	// wait1Msec(1000);
-	MoveValue(67, 60);
+	MoveValue(90, 60); //move forward so that we don't hit the fence post
 	wait1Msec(1000);
-	TurnValueGyro(450, 60);
+	TurnValueGyro(480, 60); //90 degrees is around 440
 	wait1Msec(1000);
 
 	MoveValue(35, -80); // moves back
 	wait1Msec(1000);
 
-	powerLift = -40;
-	LiftDown(1500, powerLift); // lift down
+	powerLift = -30;
+	LiftDown(1300, powerLift); // lift down
+	powerLift = -20;
+	MoveLift(powerLift);
+	
 	wait1Msec(1000);
 
 	MoveClaw(-35); // open claw
-	wait1Msec(200);
+	wait1Msec(400);
 	// MoveClaw(-25); // hold claw
 
-	MoveValue(435, 120); // moves forward to stars
+	MoveValue(550, 120); // moves forward to stars
 	MoveClaw(120);
 	wait1Msec(800); // waits until the claw pickes up the stars
 
@@ -497,12 +511,12 @@ void ProgrammingSkill_Extended(){
 
 
 	int angle = 380;
-	TurnValueGyro(angle, -80); // rotates to the wall
-	wait1Msec(globalWaiter);
+	TurnValueGyro(angle, -60); // rotates to the wall
+	wait1Msec(1000);
 
 
 	MoveValue(35, -60);  // moves to the fence
-	wait1Msec(300);
+	wait1Msec(500);
 
 	powerLift = 105;
 	LiftUpNoStop(2500, powerLift); // throw stars
@@ -594,152 +608,6 @@ void ProgrammingSkill_Extended(){
 	MoveLift(0);
 	wait1Msec(300);
 	MoveClaw(0); // opens claw
-
-	/*int angle = 300;
-	TurnValueGyro(angle, 80); // rotates to the center cube
-	wait1Msec(globalWaiter);
-	//auton
-	MoveValue(130, 120); // moves forward to cube
-
-	MoveClaw(120); // closes claw
-
-	wait1Msec(1000); // waits until the claw pickes up the cube
-
-	int powerLift = 40;
-	MoveLift(powerLift); // lift up slightly
-	wait1Msec(500);
-
-	MoveValue(95, 120); // moves forward to the center
-	wait1Msec(globalWaiter);
-
-	MoveClaw(50); // holds the claw
-
-	angle = 450;
-	TurnValueGyro(angle, -80); // rotates to the wall
-	wait1Msec(globalWaiter);
-
-	MoveValue(60, -120); // moves to the wall
-	wait1Msec(300);
-
-	powerLift = 105;
-	LiftUpNoStop(2500, powerLift);
-	MoveClaw(-120);
-	wait1Msec(100);
-	MoveLift(0);
-	wait1Msec(300);
-	MoveClaw(-30); // opens claw
-
-	// Done the first part
-
-	powerLift = -20;
-	LiftDown(1500, powerLift); // lift down
-
-	powerLift = -15;
-	MoveLift(powerLift); // lift up slightly
-	MoveClaw(0);
-
-	MoveValue(260, 120); // moves forward to the stars
-	wait1Msec(globalWaiter);
-
-	MoveClaw(120); // closes claw
-	wait1Msec(1000); // waits until the claw pickes up the stars
-
-	MoveClaw(50); // holds the claw
-	powerLift = 50;
-	MoveLift(powerLift); // lift up slightly
-	wait1Msec(500);
-
-	MoveValue(320, -120); // moves to the wall
-	wait1Msec(300);
-
-	powerLift = 120;
-	LiftUpNoStop(2500, powerLift);
-	MoveClaw(-120);
-	wait1Msec(100);
-	MoveLift(0);
-	wait1Msec(300);
-	MoveClaw(-30); // opens claw
-
-	// try one more time to pick up the stars around the fence
-
-
-	powerLift = -20;
-	LiftDown(1500, powerLift); // lift down
-
-	powerLift = -15;
-	MoveLift(powerLift); // holds down the lift slightly
-	MoveClaw(0);
-
-	MoveValue(260, 120); // moves forward to the stars
-	wait1Msec(globalWaiter);
-
-	MoveClaw(120); // closes claw
-	wait1Msec(1000); // waits until the claw pickes up the stars
-
-	MoveClaw(10); // holds the claw
-	powerLift = 50;
-	MoveLift(powerLift); // lift up slightly
-	wait1Msec(500);
-
-	MoveValue(320, -120); // moves to the wall
-	wait1Msec(300);
-
-	powerLift = 120;
-	LiftUpNoStop(2500, powerLift);
-	MoveClaw(-120);
-	wait1Msec(100);
-	MoveLift(0);
-	wait1Msec(300);
-	MoveClaw(-30); // opens claw
-
-	//
-
-
-	powerLift = -20;
-	LiftDown(1500, powerLift); // lift down
-
-
-	MoveValue(130, 120); // moves a little bit
-
-
-	wait1Msec(1000);
-
-	angle = 1300; // 180 degree?
-	TurnValueGyro(angle, 80); // rotates to the stars on the walls
-	wait1Msec(globalWaiter);
-
-
-	MoveValue(130, 120); // moves farward to the stars on the wall
-
-
-	MoveClaw(120); // closes claw
-	wait1Msec(1000); // waits until the claw pickes up the stars
-
-
-	MoveValue(140, -127); // moves backward
-
-	powerLift = 105;
-	LiftUp(1800, powerLift);
-
-
-	angle = 1300; // 180 degree?
-	TurnValueGyro(angle, 80); // rotates to the stars on the walls
-	wait1Msec(1000);
-
-
-	MoveValue(150, -127); // moves backward
-	wait1Msec(1000);
-
-	powerLift = 120;
-	LiftUpNoStop(2500, powerLift);
-	MoveClaw(-120);
-	wait1Msec(100);
-	MoveLift(0);
-	wait1Msec(300);
-	MoveClaw(-30); // opens claw
-
-	MoveClaw(0); // opens claw*/
-
 }
 
 void ClearEncoder() {
@@ -972,7 +840,7 @@ task Hang ()
 				wait1Msec(1000);
 				powerHang = 50;
 				MoveHanging(powerHang);
-				wait1Msec(380);
+				wait1Msec(400);
 				MoveHanging(0);
 
 			}
@@ -1222,15 +1090,15 @@ task Move ()
 			*/
 		}
 
-		if (vexRT[Btn5U] == 1)
-		{
-			// if (vexRT[Btn7R] == 1)
-			// {
-			//int angle = SensorValue[GyroPosition];
-			int angle = 900;
-			TurnValueGyro(angle, 50);
-			// }
-		}
+		//if (vexRT[Btn5U] == 1)
+		//{
+		//	// if (vexRT[Btn7R] == 1)
+		//	// {
+		//	//int angle = SensorValue[GyroPosition];
+		//	int angle = 900;
+		//	TurnValueGyro(angle, 50);
+		//	// }
+		//}
 
 		if (abs(motor[FrontRight]) < 25)
 		{
