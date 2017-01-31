@@ -1050,7 +1050,7 @@ task Hang ()
 			if (vexRT[Btn5U] == 1 && vexRT[Btn5D] == 0)
 			{
 				// Movies up hanging
-				int powerLift = 127;
+				int powerLift = 30;
 				MoveHanging(powerLift);
 				wait1Msec(100);
 				MoveHanging(0);
