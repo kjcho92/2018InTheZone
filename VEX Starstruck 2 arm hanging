@@ -50,8 +50,8 @@ task StopAll();
 
 // Autonomous
 int globalWaiter = 200;
-int globalHoldLiftUp = 35;
-int globalHoldLiftDown = -45;
+int globalHoldLiftUp = 45;
+int globalHoldLiftDown = -40;
 int autonomousMode = 3;
 void DisplayAutonomousMode(int autonomousModeValue);
 void displayBatteryLevelOnLCD(int autonomousModeValue);
@@ -69,6 +69,7 @@ void ShiftValue_Accel(int distance, int power);
 void GoStraight(int power);
 void StartFromFencePickThreeStarAndThrow(int distance);
 void StartFromFencePickThreeStarAndThrow_IEM();
+void Inspection();
 
 
 // User Controls
@@ -164,6 +165,10 @@ task autonomous()
 	else if (autonomousMode == 3)
 	{
 		ProgrammingSkill_Extended();
+	}
+	else if (autonomousMode == 4)
+	{
+		Inspection();
 	}
 	else
 	{
@@ -375,28 +380,21 @@ void ProgrammingSkill_Extended(){
 
 	int powerLift = 0;
 	int goBack = 500;
-	int localoldLiftDown = -40; //if new rubber bands, adjust value!
-	int powerThrow = 95;
-	int distanceLift = 2500;
-	int globalDown = 50;
-	double moveRatio = 0.8;
+	int localoldLiftDown = -25; //if new rubber bands, adjust value!
+	int powerThrow = 75;
+	int distanceLift = 2400;
+	// int
 
-	LockWheel();
+	// LockWheel();
 
-	MoveClaw(20);
+	writeDebugStreamLine("Started ===========");
+
 	MoveLift(globalHoldLiftDown); // holds down the lift slightly
+
 	MoveValue(180, -60); //move back a bit
 
 	wait1Msec(1000);
 	MoveClaw(50); // closes claw
-
-	// MoveClaw(0);
-	// wait1Msec(500);
-	// MoveValue(100, -60); //move forward a bit
-	// MoveClaw(120); // closes claw
-	// wait1Msec(500);
-	// MoveClaw(0); //stop closing
-	// MoveLift(globalHoldLiftDown); // holds down the lift slightly
 
 	for (int i = 0; i < 3; i++){
 		wait1Msec(1000);
@@ -418,14 +416,17 @@ void ProgrammingSkill_Extended(){
 		MoveLift(globalHoldLiftUp);
 		// }
 		wait1Msec(500);
-		goBack = 480-13-globalDown+10*i;
+		goBack = 400;
+		if (i == 0) {
+			goBack = 550;
+		}
 
-		MoveValue(goBack, -60); //move back to fence
+		MoveValue(goBack, -100); //move back to fence
 
-		Throw(distanceLift, powerThrow+10*i); // throw
+		Throw(distanceLift + 100, powerThrow + 30); // throw stars
 		// MoveClaw(-35); // claw opens too wide?
 		// wait1Msec(400);
-		// MoveLift(0);	
+		// MoveLift(0);
 		// wait1Msec(300);
 
 		MoveClaw(-20); // opens claw
@@ -435,20 +436,20 @@ void ProgrammingSkill_Extended(){
 		}
 		wait1Msec(700);
 		MoveClaw(0);
-		int goBackWall = 950;
+		int goBackWall = 350;
 		if (i == 2) {
 			goBackWall = 0;
 		}
-		MoveValue(goBackWall, 60); //move back to wall
+		MoveValue(goBackWall, 100); //move back to wall
 	}
 
 	wait1Msec(1000);
 
-	MoveClaw(80); // close claw
+	MoveClaw(50); // close claw
 	wait1Msec(800);
 	MoveClaw(0);
 
-	MoveValue(130, 40); //move forward so that we don't hit the fence post
+	MoveValue(150, 40); //move forward so that we don't hit the fence post
 	wait1Msec(1000);
 	TurnValueGyro(700, 40); //90 degrees is around 440
 	wait1Msec(1000);
@@ -462,7 +463,7 @@ void ProgrammingSkill_Extended(){
 
 	wait1Msec(1000);
 
-	MoveClaw(-30); // open claw
+	MoveClaw(-33); // open claw
 	wait1Msec(400);
 	// MoveClaw(-25); // hold claw
 
@@ -471,7 +472,7 @@ void ProgrammingSkill_Extended(){
 	wait1Msec(800); // waits until the claw pickes up the stars
 
 
-	MoveLift(globalHoldLiftUp+5); // lift up slightly
+	MoveLift(globalHoldLiftUp); // lift up slightly
 
 	MoveClaw(40); // holds the claw
 
@@ -502,7 +503,7 @@ void ProgrammingSkill_Extended(){
 
 
 
-	MoveValue(200, 70); // moves forward to cube
+	MoveValue(100, 120); // moves forward to cube
 	MoveClaw(120);
 	wait1Msec(800); // waits until the claw pickes up the cube
 
@@ -511,46 +512,36 @@ void ProgrammingSkill_Extended(){
 
 	MoveClaw(10); // holds the claw
 
-	MoveValue(200, -120); // moves to the fence
+	MoveValue(130, -120); // moves to the fence
 	wait1Msec(300);
 
 	Throw(distanceLift, powerThrow); // throw cube
 	MoveClaw(-25); // opens claw
 
-	powerLift = -30;
-	LiftDown(1500, powerLift); // lift down
+	StartFromFencePickThreeStarAndThrow(390);
+
+
+	MoveClaw(-25); // opens claw
+
+	LiftDown(1500, globalHoldLiftDown); // lift down
 
 	MoveLift(globalHoldLiftDown); // holds down the lift slightly
-	MoveClaw(-20);
+	MoveValue(300, 120); // moves forward to cube
+
+	MoveClaw(0); // opens claw
+
+	ShiftValue(550, -120); // shifts right
 	wait1Msec(globalWaiter);
 
-	MoveValue(450, 120); // moves forward to the stars
-	wait1Msec(500);
+	StartFromFencePickThreeStarAndThrow(180);
+}
 
-	MoveClaw(120); // closes claw
-	wait1Msec(1000); // waits until the claw pickes up the stars
 
-	MoveValue(50, -80); // moves bac
+void Inspection(){
 
-	MoveClaw(-90);
-	wait1Msec(500);
-	MoveClaw(0);
-
-	MoveValue(75, 80); // moves to the stars
-
-	MoveClaw(120);
-	wait1Msec(900);
-	MoveLift(globalHoldLiftUp); // lift up slightly
-	wait1Msec(500);
-
-	MoveClaw(60); // holds the claw
-
-	MoveValue(560, -120); // moves to the wall
-	wait1Msec(300);
-
-	powerLift = 120;
-	Throw(2500, powerLift);
-	MoveClaw(0); // opens claw
+	GoStraight(50);
+	wait1Msec(1000);
+	GoStraight(0);
 }
 
 void ClearEncoder() {
@@ -650,7 +641,7 @@ void AutonomousSelector(int btnLCD)
 		}
 		else if (button == 4 || vexRT[Btn6D] == 1)
 		{
-			if (autonomousModeValue < 3)
+			if (autonomousModeValue < 4)
 			{
 				autonomousModeValue++;
 			}
@@ -675,18 +666,23 @@ void DisplayAutonomousMode(int autonomousModeValue)
 	{
 	case 1:
 		{
-			text = "Autonomous";
+			text = "Autonomous_New";
 			break;
 		}
 	case 2:
 		{
 			//text = "ProgrammingSkill";
-			text = "None";
+			text = "Autonomous_Old";
 			break;
 		}
 	case 3:
 		{
 			text = "ProgSkill_Extended";
+			break;
+		}
+	case 4:
+		{
+			text = "Inspection";
 			break;
 		}
 	}
@@ -1063,10 +1059,13 @@ void MoveValue(int distance, int power) {
 	// MoveValue_IEM(distance, power);
 }
 
-void MoveValue_Accel(int distancftyce, int power) {
+void MoveValue_Accel(int distance, int power) {
 	// ClearEncoder();
 
 	//writeDebugStreamLine("MoveValue_Accel) Started ===");
+	//const float offset = 0.8;
+	//float distance = distance_or * offset;
+
 	int velocity = 0;
 	int position = 0;
 	int value = 0;
@@ -1078,7 +1077,7 @@ void MoveValue_Accel(int distancftyce, int power) {
 		//velocity = (value == 0)? velocity : velocity + value;
 		position += velocity;
 
-		// writeDebugStreamLine("MoveValue_Accel) pos: %d, vel: %d ", position, velocity);
+		// writeDebugStreamLine("MoveValue_Accel) pos: %d, dis: %d ", position, distance);
 		if (time1[T3] >= 2000)
 		{
 			break;
@@ -1160,7 +1159,7 @@ void ShiftValue_IEM(int distance, int power) {
 	power = AdjustPowerUsingBatteryLevel(power);
 	while (abs(nMotorEncoder[FrontLeft])<abs(distance)){
 		// while (abs(SensorValue[Wheel])<abs(distance)){
-		writeDebugStreamLine("ShiftValue) pos: %d, vel: %d ", abs(nMotorEncoder[FrontLeft]), distance);
+		// writeDebugStreamLine("ShiftValue) pos: %d, vel: %d ", abs(nMotorEncoder[FrontLeft]), distance);
 
 		Shift(power);
 	}
