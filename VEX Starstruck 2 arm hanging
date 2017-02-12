@@ -58,6 +58,9 @@ void displayBatteryLevelOnLCD(int autonomousModeValue);
 void AutonomousSelector(int btnLCD);
 void Autonomous_IEM();
 void Autonomous_Accel();
+void Autonomous_2SL();
+void Autonomous_2SR();
+void GetTwoStars(string direction);
 void ProgrammingSkill();
 void ProgrammingSkill_Extended();
 void ClearEncoder();
@@ -164,9 +167,17 @@ task autonomous()
 	}
 	else if (autonomousMode == 3)
 	{
-		ProgrammingSkill_Extended();
+		Autonomous_2SL();	
 	}
 	else if (autonomousMode == 4)
+	{
+		Autonomous_2SR();
+	}
+	else if (autonomousMode == 5)
+	{
+		ProgrammingSkill_Extended();
+	}
+	else if (autonomousMode == 6)
 	{
 		Inspection();
 	}
@@ -354,7 +365,7 @@ void StartFromFencePickThreeStarAndThrow_IEM(){
 	MoveClaw(120); // closes claw
 	wait1Msec(1000); // waits until the claw pickes up the stars
 
-	MoveValue(50, -80); // moves bac
+	MoveValue(50, -80); // moves back
 
 	MoveClaw(-90);
 	wait1Msec(500);
@@ -374,6 +385,16 @@ void StartFromFencePickThreeStarAndThrow_IEM(){
 
 	Throw(distanceLift, powerThrow);
 	MoveClaw(0); // opens claw
+}
+
+void Autonomous_2SL() {
+	string str = "left";
+	GetTwoStars(str);
+}
+
+void Autonomous_2SR() {
+	string str = "right";
+	GetTwoStars(str);
 }
 
 void ProgrammingSkill_Extended(){
@@ -467,7 +488,7 @@ void ProgrammingSkill_Extended(){
 	wait1Msec(400);
 	// MoveClaw(-25); // hold claw
 
-	MoveValue(700, 120); // moves forward to stars
+	MoveValue(670, 120); // moves forward to stars
 	MoveClaw(120);
 	wait1Msec(800); // waits until the claw pickes up the stars
 
@@ -641,7 +662,7 @@ void AutonomousSelector(int btnLCD)
 		}
 		else if (button == 4 || vexRT[Btn6D] == 1)
 		{
-			if (autonomousModeValue < 4)
+			if (autonomousModeValue < 6)
 			{
 				autonomousModeValue++;
 			}
@@ -677,10 +698,20 @@ void DisplayAutonomousMode(int autonomousModeValue)
 		}
 	case 3:
 		{
-			text = "ProgSkill_Extended";
+			text = "Autonomous_2SL";
 			break;
 		}
 	case 4:
+		{
+			text = "Autonomous_2SR";
+			break;
+		}
+	case 5:
+		{
+			text = "ProgSkill_Extended";
+			break;
+		}
+	case 6:
 		{
 			text = "Inspection";
 			break;
@@ -781,7 +812,7 @@ task Hang ()
 				wait1Msec(1000);
 				powerHang = 50;
 				MoveHanging(powerHang);
-				wait1Msec(400);
+				wait1Msec(430);
 				MoveHanging(0);
 
 			}
@@ -792,7 +823,7 @@ task Hang ()
 			if (vexRT[Btn5U] == 1 && vexRT[Btn5D] == 0)
 			{
 				// Movies up hanging
-				int powerLift = 30;
+				int powerLift = 50;
 				MoveHanging(powerLift);
 				wait1Msec(100);
 				MoveHanging(0);
@@ -947,6 +978,45 @@ void LiftUpNoStop(int distance, int power) {
 		}
 	}
 	// MoveLift(0);
+}
+
+void GetTwoStars(string direction){
+	int powerTurn = 60;
+	if (direction == "right"){
+		powerTurn = 60;
+	}
+	else {
+		powerTurn = -60;
+	}
+	
+	int powerLift = 0;
+	int goBack = 500;
+	int localoldLiftDown = -25; //if new rubber bands, adjust value!
+	int powerThrow = 75;
+	int distanceLift = 2400;
+	
+	MoveLift(localoldLiftDown); // holds down the lift slightly
+	MoveValue(250, -60);
+	ShiftValue(300, powerTurn);
+	MoveClaw(120);
+	wait1Msec(1000);
+	MoveClaw(50);
+	wait1Msec(500);
+	MoveLift(globalHoldLiftUp); // lift up slightly
+	wait1Msec(500);
+	GoStraight(-60);
+
+	MoveLift(globalHoldLiftUp);
+	wait1Msec(500);
+	goBack = 550;
+	MoveValue(goBack, -100); //move back to fence
+	Throw(distanceLift + 100, powerThrow + 30); // throw stars
+	MoveClaw(-20); // opens claw
+	LiftDown(1500, localoldLiftDown); // lift down
+	MoveLift(localoldLiftDown); // holds down the lift slightly
+	wait1Msec(700);
+	MoveClaw(0);	
+	
 }
 
 void LiftUp(int distance, int power) {
@@ -1200,4 +1270,4 @@ void LockWheel()
 	MoveHanging(-80);
 	wait1Msec(220);
 	MoveHanging(0);
-}
+	}
