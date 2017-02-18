@@ -52,7 +52,7 @@ task StopAll();
 int globalWaiter = 200;
 int globalHoldLiftUp = 45;
 int globalHoldLiftDown = -40;
-int autonomousMode = 3;
+int autonomousMode = 1;
 void DisplayAutonomousMode(int autonomousModeValue);
 void displayBatteryLevelOnLCD(int autonomousModeValue);
 void AutonomousSelector(int btnLCD);
@@ -167,7 +167,7 @@ task autonomous()
 	}
 	else if (autonomousMode == 3)
 	{
-		Autonomous_2SL();	
+		Autonomous_2SL();
 	}
 	else if (autonomousMode == 4)
 	{
@@ -205,8 +205,9 @@ void Autonomous_Accel()
 	// MoveClaw(20); // closes claw, Pick a star
 
 	LockWheel();
+	MoveClaw(30);
 
-	MoveValue(140, -80); //move back a bit
+	MoveValue(175, -80); //move back a bit
 	MoveLift(globalHoldLiftDown); // holds down the lift slightly
 
 	MoveClaw(127); // closes claw, Pick a star
@@ -215,7 +216,7 @@ void Autonomous_Accel()
 
 	MoveLift(globalHoldLiftUp - 30); // Hold up the lift
 
-	MoveValue(790, -125); // moves forward to the fence
+	MoveValue(700, -125); // moves forward to the fence
 	wait1Msec(100);
 
 	Throw(distanceLift, powerThrow); // throw a star
@@ -229,12 +230,14 @@ void Autonomous_Accel()
 	MoveClaw(-20); // opens claw
 
 	LiftDown(1500, globalHoldLiftDown); // lift down
-	MoveLift(globalHoldLiftDown); // holds down the lift slightly
+	MoveLift(globalHoldLiftDown+10); // holds down the lift slightly
+	MoveValue(25, 120);
+	
 
 	MoveClaw(120);
 
 	// MoveValue(7, 120); //move back a bit
-	wait1Msec(800); // waits until the claw pickes up the cube
+	wait1Msec(1000); // waits until the claw pickes up the cube
 
 	MoveClaw(100); // holds the claw
 
@@ -437,9 +440,9 @@ void ProgrammingSkill_Extended(){
 		MoveLift(globalHoldLiftUp);
 		// }
 		wait1Msec(500);
-		goBack = 400;
+		goBack = 250;
 		if (i == 0) {
-			goBack = 550;
+			goBack = 400;
 		}
 
 		MoveValue(goBack, -100); //move back to fence
@@ -988,13 +991,13 @@ void GetTwoStars(string direction){
 	else {
 		powerTurn = -60;
 	}
-	
+
 	int powerLift = 0;
 	int goBack = 500;
 	int localoldLiftDown = -25; //if new rubber bands, adjust value!
 	int powerThrow = 75;
 	int distanceLift = 2400;
-	
+
 	MoveLift(localoldLiftDown); // holds down the lift slightly
 	MoveValue(250, -60);
 	ShiftValue(300, powerTurn);
@@ -1008,15 +1011,13 @@ void GetTwoStars(string direction){
 
 	MoveLift(globalHoldLiftUp);
 	wait1Msec(500);
-	goBack = 550;
+	goBack = 400;
 	MoveValue(goBack, -100); //move back to fence
 	Throw(distanceLift + 100, powerThrow + 30); // throw stars
 	MoveClaw(-20); // opens claw
 	LiftDown(1500, localoldLiftDown); // lift down
-	MoveLift(localoldLiftDown); // holds down the lift slightly
-	wait1Msec(700);
-	MoveClaw(0);	
-	
+	MoveClaw(0);
+
 }
 
 void LiftUp(int distance, int power) {
