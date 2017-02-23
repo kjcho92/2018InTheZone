@@ -638,7 +638,7 @@ void ProgrammingSkill_Extended(){
 	wait1Msec(200);
 	// MoveClaw(-25); // hold claw
 
-	MoveValue(150, 40); // moves forward to stars
+	MoveValue(150, 80); // moves forward to stars
 	MoveClaw(120);
 	wait1Msec(500); // waits until the claw pickes up the stars
 
