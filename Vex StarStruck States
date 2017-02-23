@@ -61,7 +61,6 @@ void Autonomous_Accel();
 void Autonomous_2SL();
 void Autonomous_2SR();
 void GetTwoStars(string direction);
-void ProgrammingSkill();
 void ProgrammingSkill_Extended();
 void ClearEncoder();
 void MoveValue(int distance, int power);
@@ -71,6 +70,9 @@ void ShiftValue(int distance, int power);
 void ShiftValue_Accel(int distance, int power);
 void GoStraight(int power);
 void StartFromFencePickThreeStarAndThrow(int distance);
+void StartFromFencePickOneStarAndThrow(int distance);
+void StartFromFencePickStarAndThrow_Helper(int distance, int retry);
+
 void StartFromFencePickThreeStarAndThrow_IEM();
 void Inspection();
 
@@ -129,6 +131,10 @@ void pre_auton()
 	SensorValue[Accel_y] = 0;
 	nMotorEncoder[FrontLeft] = 0;
 
+
+	// LockWheel();
+
+
 	// Set bDisplayCompetitionStatusOnLcd to false if you don't want the LCD
 	// used by the competition include file, for example, you might want
 	// to display your team name on the LCD in this function.
@@ -155,6 +161,10 @@ task autonomous()
 	SensorValue[GyroPosition] = 0;
 	nMotorEncoder[FrontLeft] = 0;
 
+	// LockWheel(); LockWheel should be in the pre_auto
+
+	autonomousMode = 5;
+
 	if (autonomousMode == 1)
 	{
 		Autonomous_Accel();
@@ -162,7 +172,6 @@ task autonomous()
 	}
 	else if (autonomousMode == 2)
 	{
-
 		Autonomous_IEM();
 	}
 	else if (autonomousMode == 3)
@@ -187,7 +196,6 @@ task autonomous()
 	}
 
 	writeDebugStreamLine("autonomous) Time: %d", nPgmTime - startTime);
-
 }
 
 
@@ -201,10 +209,9 @@ void Autonomous_Accel()
 	int powerThrow = 90;
 	int distanceLift = 2400;
 
-
 	// MoveClaw(20); // closes claw, Pick a star
 
-	LockWheel();
+	// LockWheel();
 	MoveClaw(30);
 
 	MoveValue(175, -80); //move back a bit
@@ -307,9 +314,16 @@ void Throw(int distanceLift, int powerThrow){
 	wait1Msec(300);
 }
 
+void StartFromFencePickOneStarAndThrow(int distance){
+	 StartFromFencePickStarAndThrow_Helper(distance, 1);
+}
+
 
 void StartFromFencePickThreeStarAndThrow(int distance){
+	 StartFromFencePickStarAndThrow_Helper(distance, 3);
+}
 
+void StartFromFencePickStarAndThrow_Helper(int distance, int retry){
 	int powerLift = -30;
 	int powerThrow = 120;
 	int distanceLift = 2500;
@@ -327,17 +341,19 @@ void StartFromFencePickThreeStarAndThrow(int distance){
 	MoveClaw(120); // closes claw
 	wait1Msec(1000); // waits until the claw pickes up the stars
 
-	MoveValue(50, -80); // moves bac
+	if (retry > 1){
+		MoveValue(50, -80); // moves bac
 
-	// Open and close
-	MoveClaw(-90);
-	wait1Msec(400);
-	MoveClaw(0);
+		// Open and close
+		MoveClaw(-90);
+		wait1Msec(400);
+		MoveClaw(0);
 
-	MoveValue(60, 80); // moves to the stars
+		MoveValue(60, 80); // moves to the stars
+		MoveClaw(120);
+		wait1Msec(500);
+	}
 
-	MoveClaw(120);
-	wait1Msec(500);
 	MoveLift(globalHoldLiftUp); // lift up slightly
 	wait1Msec(300);
 
@@ -400,6 +416,42 @@ void Autonomous_2SR() {
 	GetTwoStars(str);
 }
 
+void GetTwoStars(string direction){
+	int powerTurn = 60;
+	if (direction == "right"){
+		powerTurn = 60;
+	}
+	else {
+		powerTurn = -60;
+	}
+
+	int powerLift = 0;
+	int goBack = 500;
+	int localoldLiftDown = -25; //if new rubber bands, adjust value!
+	int powerThrow = 75;
+	int distanceLift = 2400;
+
+	MoveLift(localoldLiftDown); // holds down the lift slightly
+	MoveValue(250, -60);
+	ShiftValue(300, powerTurn);
+	MoveClaw(120);
+	wait1Msec(1000);
+	MoveClaw(50);
+	wait1Msec(500);
+	MoveLift(globalHoldLiftUp); // lift up slightly
+	wait1Msec(500);
+	GoStraight(-60);
+
+	MoveLift(globalHoldLiftUp);
+	wait1Msec(500);
+	goBack = 400;
+	MoveValue(goBack, -100); //move back to fence
+	Throw(distanceLift + 100, powerThrow + 30); // throw stars
+	MoveClaw(-20); // opens claw
+	LiftDown(1500, localoldLiftDown); // lift down
+	MoveClaw(0);
+}
+
 void ProgrammingSkill_Extended(){
 
 	int powerLift = 0;
@@ -433,7 +485,7 @@ void ProgrammingSkill_Extended(){
 		MoveClaw(50); // holds claw
 		GoStraight(-60);
 
-		//while (SensorValue(LiftPosition) < 1300/*&&(vexRT[Btn7U]==0)*/){
+		//while (SensorValue(LiftPosition) < 1300){
 		//if (vexRT[Btn7U]==1){
 		//	MoveLift(100);
 		//}
@@ -557,7 +609,112 @@ void ProgrammingSkill_Extended(){
 	ShiftValue(550, -120); // shifts right
 	wait1Msec(globalWaiter);
 
-	StartFromFencePickThreeStarAndThrow(180);
+	StartFromFencePickOneStarAndThrow(180);
+	wait1Msec(1000);
+
+	///////////////////////////////////
+	// starts for the last 2 stars
+	// 1st star
+
+	MoveClaw(50); // close claw
+	wait1Msec(800);
+	MoveClaw(0);
+
+	MoveValue(150, 40); //move forward so that we don't hit the fence post
+	wait1Msec(500);
+	TurnValueGyro(700, 40); //90 degrees is around 440
+	wait1Msec(500);
+
+	MoveValue(45, -80); // moves back
+	wait1Msec(500);
+
+	LiftDown(1300, localoldLiftDown); // lift down
+
+	MoveLift(localoldLiftDown); // hold lift down
+
+	wait1Msec(500);
+
+	MoveClaw(-39); // open claw
+	wait1Msec(200);
+	// MoveClaw(-25); // hold claw
+
+	MoveValue(150, 40); // moves forward to stars
+	MoveClaw(120);
+	wait1Msec(500); // waits until the claw pickes up the stars
+
+
+	// MoveLift(globalHoldLiftUp); // lift up slightly
+
+	// MoveClaw(40); // holds the claw
+
+	// wait1Msec(100);
+
+
+	angle = 450;
+	TurnValueGyro(angle, -70); // rotates to the wall
+	wait1Msec(1000);
+
+
+	StartFromFencePickThreeStarAndThrow(390);
+
+
+}
+
+void test(){
+	/*
+
+	MoveClaw(50); // close claw
+	wait1Msec(800);
+	MoveClaw(0);
+
+	MoveValue(150, 40); //move forward so that we don't hit the fence post
+	wait1Msec(1000);
+	TurnValueGyro(700, 40); //90 degrees is around 440
+	wait1Msec(1000);
+
+	MoveValue(45, -80); // moves back
+	wait1Msec(1000);
+
+	LiftDown(1300, localoldLiftDown); // lift down
+
+	MoveLift(localoldLiftDown); // hold lift down
+
+	wait1Msec(1000);
+
+	MoveClaw(-33); // open claw
+	wait1Msec(400);
+	// MoveClaw(-25); // hold claw
+
+	MoveValue(150, 40); // moves forward to stars
+	MoveClaw(120);
+	wait1Msec(800); // waits until the claw pickes up the stars
+
+
+	MoveLift(globalHoldLiftUp); // lift up slightly
+
+	MoveClaw(40); // holds the claw
+
+	wait1Msec(100);
+
+
+	int angle = 450;
+	TurnValueGyro(angle, -70); // rotates to the wall
+	wait1Msec(1000);
+
+
+	MoveValue(150, -60);  // moves to the fence // if we throw too early? shorten the distance
+	wait1Msec(300);
+
+	Throw(distanceLift + 100, powerThrow + 30); // throw stars
+	MoveClaw(-25); // opens claw
+
+	// 2nd star
+
+
+
+	StartFromFencePickOneStarAndThrow(390);
+
+	*/
 }
 
 
@@ -981,43 +1138,6 @@ void LiftUpNoStop(int distance, int power) {
 		}
 	}
 	// MoveLift(0);
-}
-
-void GetTwoStars(string direction){
-	int powerTurn = 60;
-	if (direction == "right"){
-		powerTurn = 60;
-	}
-	else {
-		powerTurn = -60;
-	}
-
-	int powerLift = 0;
-	int goBack = 500;
-	int localoldLiftDown = -25; //if new rubber bands, adjust value!
-	int powerThrow = 75;
-	int distanceLift = 2400;
-
-	MoveLift(localoldLiftDown); // holds down the lift slightly
-	MoveValue(250, -60);
-	ShiftValue(300, powerTurn);
-	MoveClaw(120);
-	wait1Msec(1000);
-	MoveClaw(50);
-	wait1Msec(500);
-	MoveLift(globalHoldLiftUp); // lift up slightly
-	wait1Msec(500);
-	GoStraight(-60);
-
-	MoveLift(globalHoldLiftUp);
-	wait1Msec(500);
-	goBack = 400;
-	MoveValue(goBack, -100); //move back to fence
-	Throw(distanceLift + 100, powerThrow + 30); // throw stars
-	MoveClaw(-20); // opens claw
-	LiftDown(1500, localoldLiftDown); // lift down
-	MoveClaw(0);
-
 }
 
 void LiftUp(int distance, int power) {
