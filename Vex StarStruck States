@@ -306,6 +306,30 @@ void Autonomous_IEM()
 
 }
 
+
+void Throw_New(int distanceLift, int powerThrow){
+	while (abs(SensorValue[LiftPosition])<abs(3200)){
+		MoveLift(powerLift);
+		if (vexRT[Btn8L] == 1)
+		{
+			break;
+		}
+
+
+		if (abs(SensorValue[LiftPosition]) > 2600  ){
+			MoveClaw(-120);
+		}
+	}
+
+	MoveLift(0);
+	MoveClaw(0);
+
+	LiftDown(1200, -39);
+	MoveLift(-10);
+
+}
+
+
 void Throw(int distanceLift, int powerThrow){
 	LiftUpNoStop(distanceLift, powerThrow); // throw a star
 	MoveClaw(-90);
@@ -315,12 +339,12 @@ void Throw(int distanceLift, int powerThrow){
 }
 
 void StartFromFencePickOneStarAndThrow(int distance){
-	 StartFromFencePickStarAndThrow_Helper(distance, 1);
+	StartFromFencePickStarAndThrow_Helper(distance, 1);
 }
 
 
 void StartFromFencePickThreeStarAndThrow(int distance){
-	 StartFromFencePickStarAndThrow_Helper(distance, 3);
+	StartFromFencePickStarAndThrow_Helper(distance, 3);
 }
 
 void StartFromFencePickStarAndThrow_Helper(int distance, int retry){
@@ -1039,13 +1063,29 @@ task Lift ()
 				// wait1Msec(500);
 				// MoveClaw(0);
 
+
+				// 3200, 2600
 				int powerLift = 120;
-				LiftUpNoStop(2500, powerLift);
-				MoveClaw(-70);
-				wait1Msec(100);
+				while (abs(SensorValue[LiftPosition])<abs(3200)){
+					MoveLift(powerLift);
+					if (vexRT[Btn8L] == 1)
+					{
+						break;
+					}
+
+
+					if (abs(SensorValue[LiftPosition]) > 2600  ){
+						MoveClaw(-120);
+					}
+				}
+
 				MoveLift(0);
-				wait1Msec(300);
 				MoveClaw(0);
+
+				LiftDown(1200, -39);
+				MoveLift(-10);
+
+
 
 			}
 			if (vexRT[Btn7D] == 1)
@@ -1059,7 +1099,7 @@ task Lift ()
 					int powerLift = -20;
 					MoveLift(powerLift);
 				}
-				MoveLift(-10);
+				MoveLift(-20);
 			}
 		}
 
@@ -1391,4 +1431,4 @@ void LockWheel()
 	MoveHanging(-80);
 	wait1Msec(220);
 	MoveHanging(0);
-	}
+}
