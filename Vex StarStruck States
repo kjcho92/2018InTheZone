@@ -384,7 +384,7 @@ void StartFromFencePickStarAndThrow_Helper(int distance, int retry){
 
 	MoveClaw(80); // holds the claw
 
-	MoveValue(800, -100); // moves to the wall
+	MoveValue(880, -100); // moves to the wall
 	wait1Msec(100);
 
 	Throw(distanceLift, powerThrow);
@@ -614,10 +614,10 @@ void ProgrammingSkill(){
 	wait1Msec(1000);
 
 	MoveClaw(-38); // open claw
-	wait1Msec(400);
+	wait1Msec(300);
 	// MoveClaw(-25); // hold claw
 
-	MoveValue(770, 120); // moves forward to stars
+	MoveValue(670, 120); // moves forward to stars
 	MoveClaw(120);
 	wait1Msec(800); // waits until the claw pickes up the stars
 
@@ -653,7 +653,7 @@ void ProgrammingSkill(){
 
 
 
-	MoveValue(100, 100); // moves forward to cube
+	MoveValue(120, 120); // moves towards the back stars
 	MoveClaw(120);
 	wait1Msec(800); // waits until the claw pickes up the cube
 
@@ -668,7 +668,7 @@ void ProgrammingSkill(){
 	Throw(distanceLift, powerThrow); // throw cube
 	MoveClaw(-25); // opens claw
 
-	StartFromFencePickThreeStarAndThrow(390);
+	StartFromFencePickOneStarAndThrow(390);
 
 
 	MoveClaw(-25); // opens claw
@@ -680,7 +680,7 @@ void ProgrammingSkill(){
 
 	MoveClaw(0); // opens claw
 
-	ShiftValue(580, -100); // shifts right
+	ShiftValue(770, -120); // shifts right
 	wait1Msec(globalWaiter);
 
 	StartFromFencePickOneStarAndThrow(250);
@@ -708,11 +708,11 @@ void ProgrammingSkill(){
 
 	wait1Msec(500);
 
-	MoveClaw(-50); // open claw
+	MoveClaw(-90); // open claw
 	wait1Msec(200);
 	// MoveClaw(-25); // hold claw
 
-	MoveValue(300, 70); // moves forward to stars
+	MoveValue(400, 70); // moves forward to stars
 	MoveClaw(120);
 	wait1Msec(500); // waits until the claw pickes up the stars
 
@@ -724,7 +724,7 @@ void ProgrammingSkill(){
 	// wait1Msec(100);
 
 
-	angle = 600;
+	angle = 500;
 	TurnValueGyro(angle, -70); // rotates to the wall
 	wait1Msec(1000);
 	
@@ -734,7 +734,7 @@ void ProgrammingSkill(){
 	MoveClaw(-120);
 	wait1Msec(300);
 	
-	StartFromFencePickStarAndThrow_Helper_Final(500, 3);
+	StartFromFencePickStarAndThrow_Helper_Final(600, 1);
 
 
 
