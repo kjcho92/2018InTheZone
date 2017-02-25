@@ -52,7 +52,7 @@ task StopAll();
 int globalWaiter = 200;
 int globalHoldLiftUp = 45;
 int globalHoldLiftDown = -40;
-int autonomousMode = 1;
+int autonomousMode = 5;
 void DisplayAutonomousMode(int autonomousModeValue);
 void displayBatteryLevelOnLCD(int autonomousModeValue);
 void AutonomousSelector(int btnLCD);
@@ -73,6 +73,7 @@ void GoStraight(int power);
 void StartFromFencePickThreeStarAndThrow(int distance);
 void StartFromFencePickOneStarAndThrow(int distance);
 void StartFromFencePickStarAndThrow_Helper(int distance, int retry);
+void StartFromFencePickStarAndThrow_Helper_Final(int distance, int retry);
 
 //void StartFromFencePickThreeStarAndThrow_IEM();
 void Inspection();
@@ -390,6 +391,49 @@ void StartFromFencePickStarAndThrow_Helper(int distance, int retry){
 	MoveClaw(0); // opens claw
 }
 
+void StartFromFencePickStarAndThrow_Helper_Final(int distance, int retry){
+	int powerLift = -39;
+	int powerThrow = 120;
+	int distanceLift = 2800;
+	// int localHoldLiftUp = 35;
+
+	LiftDown(1500, powerLift); // lift down
+
+	MoveLift(globalHoldLiftDown); // holds down the lift slightly
+	MoveClaw(-20);
+	wait1Msec(globalWaiter);
+
+	MoveValue(distance, 100); // moves forward to the stars
+	wait1Msec(300);
+
+	MoveClaw(120); // closes claw
+	wait1Msec(1000); // waits until the claw pickes up the stars
+
+	if (retry > 1){
+		MoveValue(50, -80); // moves bac
+
+		// Open and close
+		MoveClaw(-90);
+		wait1Msec(400);
+		MoveClaw(0);
+
+		MoveValue(100, 80); // moves to the stars
+		MoveClaw(120);
+		wait1Msec(500);
+	}
+
+	MoveLift(globalHoldLiftUp); // lift up slightly
+	wait1Msec(300);
+
+	MoveClaw(80); // holds the claw
+
+	MoveValue(700, -100); // moves to the wall
+	wait1Msec(100);
+
+	Throw(distanceLift, powerThrow);
+	MoveClaw(0); // opens claw
+}
+
 //void StartFromFencePickThreeStarAndThrow_IEM(){
 
 //	int powerLift = -30;
@@ -483,7 +527,7 @@ void ProgrammingSkill(){
 	int distanceThrow = 2600;
 	// int
 
-	// LockWheel();
+	LockWheel();
 
 	writeDebugStreamLine("Started ===========");
 
@@ -514,7 +558,7 @@ void ProgrammingSkill(){
 		MoveLift(globalHoldLiftUp);
 		// }
 		wait1Msec(300);
-		goBack = 500;
+		goBack = 350;
 		if (i == 0) {
 			goBack = 500;
 		}
@@ -536,28 +580,31 @@ void ProgrammingSkill(){
 			Throw(2800, 120); // throw stars
 			wait1Msec(200);
 		}
-		MoveClaw(-30);
-		int goBackWall = 230;
+		int clawPower = -30;
+		if (i == 1) {
+			MoveClaw(clawPower);
+		}
+		MoveClaw(-25);
+		int goBackWall = 190;
 		if (i == 2) {
 			goBackWall = 0;
+			MoveClaw(0);
 		}
 		MoveValue(goBackWall, 100); //move back to wall
 		// should be done in 20 secs
 	}
-
-
 	wait1Msec(1000);
 
-	MoveClaw(50); // close claw
+	MoveClaw(70); // close claw
 	wait1Msec(800);
 	MoveClaw(0);
 
 	MoveValue(150, 40); //move forward so that we don't hit the fence post
 	wait1Msec(1000);
-	TurnValueGyro(700, 40); //90 degrees is around 440
+	TurnValueGyro(790, 40); //90 degrees is around 440
 	wait1Msec(1000);
 
-	MoveValue(45, -80); // moves back
+	MoveValue(80, -80); // moves back
 	wait1Msec(1000);
 
 	LiftDown(1300, localoldLiftDown); // lift down
@@ -566,11 +613,11 @@ void ProgrammingSkill(){
 
 	wait1Msec(1000);
 
-	MoveClaw(-33); // open claw
+	MoveClaw(-38); // open claw
 	wait1Msec(400);
 	// MoveClaw(-25); // hold claw
 
-	MoveValue(680, 120); // moves forward to stars
+	MoveValue(770, 120); // moves forward to stars
 	MoveClaw(120);
 	wait1Msec(800); // waits until the claw pickes up the stars
 
@@ -615,7 +662,7 @@ void ProgrammingSkill(){
 
 	MoveClaw(10); // holds the claw
 
-	MoveValue(160, -100); // moves to the fence
+	MoveValue(100, -100); // moves to the fence
 	wait1Msec(300);
 
 	Throw(distanceLift, powerThrow); // throw cube
@@ -629,31 +676,31 @@ void ProgrammingSkill(){
 	LiftDown(1500, globalHoldLiftDown); // lift down
 
 	MoveLift(globalHoldLiftDown); // holds down the lift slightly
-	MoveValue(300, 120); // moves forward to cube
+	MoveValue(300, 100); // moves forward to cube
 
 	MoveClaw(0); // opens claw
 
-	ShiftValue(550, -120); // shifts right
+	ShiftValue(580, -100); // shifts right
 	wait1Msec(globalWaiter);
 
-	StartFromFencePickOneStarAndThrow(180);
+	StartFromFencePickOneStarAndThrow(250);
 	wait1Msec(1000);
 
 	///////////////////////////////////
 	// starts for the last 2 stars
 	// 1st star
 
-	MoveClaw(50); // close claw
+	MoveClaw(30); // close claw
 	wait1Msec(800);
 	MoveClaw(0);
 
 	MoveValue(150, 40); //move forward so that we don't hit the fence post
 	wait1Msec(500);
-	TurnValueGyro(700, 40); //90 degrees is around 440
-	wait1Msec(500);
+	TurnValueGyro(650, 40); //90 degrees is around 440
+	wait1Msec(500);	
 
-	MoveValue(45, -80); // moves back
-	wait1Msec(500);
+	MoveValue(70, -80); // moves back
+	wait1Msec(600);
 
 	LiftDown(1300, localoldLiftDown); // lift down
 
@@ -661,11 +708,11 @@ void ProgrammingSkill(){
 
 	wait1Msec(500);
 
-	MoveClaw(-39); // open claw
+	MoveClaw(-50); // open claw
 	wait1Msec(200);
 	// MoveClaw(-25); // hold claw
 
-	MoveValue(230, 70); // moves forward to stars
+	MoveValue(300, 70); // moves forward to stars
 	MoveClaw(120);
 	wait1Msec(500); // waits until the claw pickes up the stars
 
@@ -680,13 +727,14 @@ void ProgrammingSkill(){
 	angle = 600;
 	TurnValueGyro(angle, -70); // rotates to the wall
 	wait1Msec(1000);
-
-
-	ShiftValue(50, -120); // shifts right
+	
+	ShiftValue(70, -120); // shifts right
 	wait1Msec(globalWaiter);
 
-
-	StartFromFencePickThreeStarAndThrow(390);
+	MoveClaw(-120);
+	wait1Msec(300);
+	
+	StartFromFencePickStarAndThrow_Helper_Final(500, 3);
 
 
 
@@ -697,7 +745,6 @@ void ProgrammingSkill_Extended(){
 	int localoldLiftDown = -25; //if new rubber bands, adjust value!
 	int powerThrow = 75;
 	int distanceLift = 2400;
-	// int
 
 	// LockWheel();
 
