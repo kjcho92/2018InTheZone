@@ -569,6 +569,9 @@ void ProgrammingSkill(){
 		if (i == 0) {
 			goBack = 500;
 		}
+		if (i == 2) {
+			goBack = 300;
+		}
 
 		MoveValue(goBack, -100); //move back to fence
 
@@ -592,7 +595,7 @@ void ProgrammingSkill(){
 			MoveClaw(clawPower);
 		}
 		MoveClaw(-25);
-		int goBackWall = 230;
+		int goBackWall = 280;
 		if (i == 2) {
 			goBackWall = 0;
 			MoveClaw(0);
@@ -605,13 +608,13 @@ void ProgrammingSkill(){
 	MoveClaw(70); // close claw
 	wait1Msec(800);
 	MoveClaw(0);
-
-	MoveValue(150-90, 40); //move forward so that we don't hit the fence post
+	LiftDown(2000, localoldLiftDown + 16); // lift down
+	MoveValue(150-125, 60); //move forward so that we don't hit the fence post
 	wait1Msec(1000);
-	TurnValueGyro(790, 40); //90 degrees is around 440
+	TurnValueGyro(790 - 100, 40); //90 degrees is around 440
 	wait1Msec(1000);
 
-	MoveValue(80, -80); // moves back
+	MoveValue(80 - 10, -80); // moves back
 	wait1Msec(1000);
 
 	LiftDown(1300, localoldLiftDown); // lift down
@@ -620,11 +623,11 @@ void ProgrammingSkill(){
 
 	wait1Msec(1000);
 
-	MoveClaw(-38); // open claw
+	MoveClaw(-35); // open claw
 	wait1Msec(300);
 	// MoveClaw(-25); // hold claw
 
-	MoveValue(670-150, 120); // moves forward to stars
+	MoveValue(670 + 60, 120); // moves forward to stars
 	MoveClaw(120);
 	wait1Msec(800); // waits until the claw pickes up the stars
 
@@ -669,13 +672,13 @@ void ProgrammingSkill(){
 
 	MoveClaw(10); // holds the claw
 
-	MoveValue(100, -100); // moves to the fence
+	MoveValue(100-100, -100); // moves to the fence
 	wait1Msec(300);
 
 	Throw(distanceLift, powerThrow); // throw cube
 	MoveClaw(-25); // opens claw
 
-	StartFromFencePickThreeStarAndThrow(420-20);
+	StartFromFencePickThreeStarAndThrow(420 - 180);
 
 	// wait1Msec(1000); // do we need this?
 
@@ -693,14 +696,14 @@ void ProgrammingSkill_CubeAndStars(){
 	LiftDown(1500, globalHoldLiftDown); // lift down
 
 	MoveLift(globalHoldLiftDown); // holds down the lift slightly
-	MoveValue(300-150, 100); // moves forward to cube
+	MoveValue(300 + 50, 100); // moves forward to cube
 
 	MoveClaw(0); // opens claw
 
-	ShiftValue(900-170, -120); // shifts right
+	ShiftValue(900-170 + 0, -120); // shifts right
 	wait1Msec(globalWaiter);
 
-	StartFromFencePickOneStarAndThrow(250);
+	StartFromFencePickOneStarAndThrow(150);
 
 
 	MoveClaw(-25); // opens claw
@@ -708,14 +711,14 @@ void ProgrammingSkill_CubeAndStars(){
 	LiftDown(1500, globalHoldLiftDown); // lift down
 
 	MoveLift(globalHoldLiftDown); // holds down the lift slightly
-	MoveValue(300-150, 100); // moves forward to cube
+	MoveValue(300, 100); // moves forward to cube
 
 	MoveClaw(0); // opens claw
 
-	ShiftValue(220-70, -120); // shifts right
+	ShiftValue(220-100, -120); // shifts right
 	wait1Msec(globalWaiter);
 
-	StartFromFencePickThreeStarAndThrow(250);
+	StartFromFencePickThreeStarAndThrow(150);
 
 }
 
@@ -1371,10 +1374,10 @@ task Hang ()
 				wait1Msec(200);
 				MoveHanging(powerHang);
 				wait1Msec(1000);
-				powerHang = 50;
+				powerHang = 80;
 				MoveHanging(powerHang);
 				wait1Msec(430);
-				MoveHanging(10);
+				MoveHanging(20);
 
 			}
 		}
@@ -1387,7 +1390,7 @@ task Hang ()
 				int powerLift = 50;
 				MoveHanging(powerLift);
 				wait1Msec(100);
-				MoveHanging(0);
+				MoveHanging(20);
 			}
 			else if (vexRT[Btn5D] == 1 && vexRT[Btn5U] == 0)
 			{
