@@ -370,7 +370,7 @@ void Throw_New(int distanceLift, int distanceThrow, int powerThrow){
 	MoveClaw(0);
 
 	LiftDown(1200, -39);
-	MoveLift(-10);
+	MoveLift(-15);
 }
 
 
@@ -1217,7 +1217,7 @@ task usercontrol()
 			}
 			MoveClaw(120);
 			wait1Msec(120);
-			MoveClaw(39);
+			MoveClaw(39 + 11);
 		}
 		//motor[FrontLeft] = -C1LY - C1LX - C1RX;
 		//motor[FrontRight] =  C1LY - C1LX - C1RX;
@@ -1251,7 +1251,7 @@ void AutonomousSelector(int btnLCD)
 			bLCDBacklight=false;
 			break;
 		}
-		else if (button == 1 || vexRT[Btn6U] == 1)
+		else if (button == 1 || vexRT[Btn5U] == 1)
 		{
 			if (autonomousModeValue > 1)
 			{
@@ -1260,7 +1260,7 @@ void AutonomousSelector(int btnLCD)
 
 			DisplayAutonomousMode(autonomousModeValue);
 		}
-		else if (button == 4 || vexRT[Btn6D] == 1)
+		else if (button == 4 || vexRT[Btn5D] == 1)
 		{
 			if (autonomousModeValue < 6)
 			{
@@ -1397,7 +1397,6 @@ task Hang ()
 	{
 		wait1Msec(50);
 
-
 		if (vexRT[Btn8U] == 1)
 		{
 			if (vexRT[Btn6D] == 1)
@@ -1416,14 +1415,10 @@ task Hang ()
 				MoveHanging(20);
 
 			}
-		}
-		if (vexRT[Btn8U] == 1)
-		{
-
-			if (vexRT[Btn5U] == 1 && vexRT[Btn5D] == 0)
+			else if (vexRT[Btn5U] == 1 && vexRT[Btn5D] == 0)
 			{
 				// Movies up hanging
-				int powerLift = 50;
+				int powerLift = 100;
 				MoveHanging(powerLift);
 				wait1Msec(100);
 				MoveHanging(20);
@@ -1437,7 +1432,7 @@ task Hang ()
 			else if (vexRT[Btn5D] == 1 && vexRT[Btn5U] == 1)
 			{
 				// Holds hanging
-				int powerHang = -40;
+				int powerHang = -20;
 				MoveHanging(powerHang);
 			}
 		}
@@ -1481,7 +1476,7 @@ task Lift ()
 
 
 				// 3200, 2600
-				int powerLift = 120;
+				int powerLift = 120 + 5;
 				while (abs(SensorValue[LiftPosition])<abs(3200)){
 					MoveLift(powerLift);
 					if (vexRT[Btn8L] == 1)
@@ -1498,8 +1493,8 @@ task Lift ()
 				MoveLift(0);
 				MoveClaw(0);
 
-				LiftDown(1200, -39);
-				MoveLift(-10);
+				LiftDown(1160, -(39 + 15));
+				MoveLift(-20);
 
 
 
@@ -1532,7 +1527,7 @@ task Lift ()
 			}
 			if (vexRT[Btn7D] == 1)
 			{
-				int powerLift = -38;
+				int powerLift = -(38 + 5) ;
 				LiftDown(1160, powerLift);
 				if ((SensorValue[LiftPosition]) < 1500)
 				{
