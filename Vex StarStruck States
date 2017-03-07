@@ -140,17 +140,7 @@ void pre_auton()
 	SensorValue[Accel_y] = 0;
 	nMotorEncoder[FrontLeft] = 0;
 
-
 	// LockWheel();
-
-
-	// Set bDisplayCompetitionStatusOnLcd to false if you don't want the LCD
-	// used by the competition include file, for example, you might want
-	// to display your team name on the LCD in this function.
-	// bDisplayCompetitionStatusOnLcd = false;
-
-	// All activities that occur before the competition starts
-	// Example: clearing encoders, setting servo positions, ...
 }
 
 /*---------------------------------------------------------------------------*/
@@ -170,9 +160,9 @@ task autonomous()
 	SensorValue[GyroPosition] = 0;
 	nMotorEncoder[FrontLeft] = 0;
 
-	LockWheel(); // LockWheel should be in the pre_auto
+	// LockWheel(); // LockWheel should be in the pre_auto
 
-	autonomousMode = 5;
+	autonomousMode = 1;
 
 	if (autonomousMode == 1)
 	{
@@ -224,7 +214,7 @@ void Autonomous_Accel()
 	// LockWheel();
 	MoveClaw(30);
 
-	MoveValue(175, -80); //move back a bit
+	MoveValue(175 - 70, -80); //move back a bit
 	MoveLift(globalHoldLiftDown); // holds down the lift slightly
 
 	MoveClaw(127); // closes claw, Pick a star
@@ -233,7 +223,7 @@ void Autonomous_Accel()
 
 	MoveLift(globalHoldLiftUp - 30); // Hold up the lift
 
-	MoveValue(700, -125); // moves forward to the fence
+	MoveValue(700 + 80, -125); // moves forward to the fence
 	wait1Msec(100);
 
 	Throw(distanceLift, powerThrow); // throw a star
@@ -248,7 +238,7 @@ void Autonomous_Accel()
 
 	LiftDown(1500, globalHoldLiftDown); // lift down
 	MoveLift(globalHoldLiftDown+10); // holds down the lift slightly
-	MoveValue(25, 120);
+	MoveValue(25 - 25, 120);
 
 
 	MoveClaw(120);
@@ -259,29 +249,71 @@ void Autonomous_Accel()
 	MoveClaw(100); // holds the claw
 
 	Throw(distanceLift, powerThrow); // throw cube
+	writeDebugStreamLine("autonomous) Throw Cube: %d", nPgmTime);
+	// 10165
 
 	MoveClaw(-25); // opens claw
 	// END: throw a cube
 
 	// BEGIN: throw three stars
 
-	StartFromFencePickThreeStarAndThrow(270);
+	StartFromFencePickThreeStarAndThrow(200 - 0);
+	// 13862
 }
 
 
 void Autonomous_IEM()
+{
+	MoveValue(5, 70); // moves forward slightly to drop the preload star
+	wait1Msec(globalWaiter);
+
+	MoveClaw(47); // closes claw
+
+	MoveLift(globalHoldLiftDown); // holds down the lift slightly
+
+	ShiftValue(240-20, -120); // shifts right
+	wait1Msec(globalWaiter);
+
+	MoveValue(300, 120); // moves forward to cube
+	MoveClaw(120);
+	wait1Msec(800); // waits until the claw pickes up the cube
+
+	MoveLift(globalHoldLiftUp - 5); // lift up slightly
+
+	// MoveValue(70 - 20, 120); // moves forward to the center
+	// wait1Msec(globalWaiter);
+
+	MoveClaw(10); // holds the claw
+
+	int angle = 380 - 39;
+	TurnValueGyro(angle, -80); // rotates to the wall
+	wait1Msec(globalWaiter);
+
+	MoveValue(190, -120); // moves to the fence
+
+	int powerLift = 105 - 10;
+	Throw(2500, powerLift);
+	writeDebugStreamLine("autonomous) Throw Cube: %d", nPgmTime);
+	// 7850
+	MoveClaw(-25); // opens claw
+
+	StartFromFencePickThreeStarAndThrow(220-20);
+	// 12044
+}
+
+void Autonomous_IEM1()
 {
 	// float offset = 0.2;
 	// StartAuto(); //Opens out claw
 	//Auton
 	// LockWheel();
 
-	wait1Msec(300);
+	// wait1Msec(300);
 	MoveClaw(47); // closes claw
 
 	MoveLift(globalHoldLiftDown); // holds down the lift slightly
 
-	ShiftValue(200, -120); // shifts right
+	ShiftValue(240-20, -120); // shifts right
 	wait1Msec(globalWaiter);
 
 	MoveValue(300, 120); // moves forward to cube
@@ -291,12 +323,12 @@ void Autonomous_IEM()
 	MoveLift(globalHoldLiftUp - 5); // lift up slightly
 	// wait1Msec(800); //
 
-	MoveValue(70, 120); // moves forward to the center
+	MoveValue(70 - 20, 120); // moves forward to the center
 	wait1Msec(globalWaiter);
 
 	MoveClaw(10); // holds the claw
 
-	int angle = 380;
+	int angle = 380 - 39;
 	TurnValueGyro(angle, -80); // rotates to the wall
 	wait1Msec(globalWaiter);
 
@@ -305,6 +337,8 @@ void Autonomous_IEM()
 
 	int powerLift = 105 - 10;
 	Throw(2500, powerLift);
+	writeDebugStreamLine("autonomous) Throw Cube: %d", nPgmTime);
+	// 8174
 	MoveClaw(-25); // opens claw
 
 	/*angle = 30;
@@ -312,7 +346,9 @@ void Autonomous_IEM()
 	wait1Msec(globalWaiter);*/
 	// Done the first part
 
-	StartFromFencePickThreeStarAndThrow(220);
+	StartFromFencePickThreeStarAndThrow(220-20);
+
+	// 12365, 12401
 
 }
 
