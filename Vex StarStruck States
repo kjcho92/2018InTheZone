@@ -162,7 +162,7 @@ task autonomous()
 
 	// LockWheel(); // LockWheel should be in the pre_auto
 
-	autonomousMode = 1;
+	autonomousMode = 2;
 
 	if (autonomousMode == 1)
 	{
@@ -285,7 +285,7 @@ void Autonomous_IEM()
 
 	MoveClaw(10); // holds the claw
 
-	int angle = 380 - 39;
+	int angle = 380 - 29;
 	TurnValueGyro(angle, -80); // rotates to the wall
 	wait1Msec(globalWaiter);
 
