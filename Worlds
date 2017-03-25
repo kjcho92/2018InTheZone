@@ -187,8 +187,8 @@ task Hang()
 				LiftUpAndStop(2300, MaxPower);
 			} else if (vexRT[Btn5D] == 1) {
 				LiftDown(MaxPower);
-				wait1Msec(5000);
-				LiftDown(0);
+				// wait1Msec(5000);
+				// LiftDown(0);
 				// LiftDownAndStop(900,  110);
 				// LiftDown(50);
 			}
@@ -261,7 +261,7 @@ task ClawLeftTask()
 			}
 		} else if (vexRT[Btn8U] == 1) {
 
-			int positionOpen = 3100;
+			int positionOpen = 4000;
 
 			if (vexRT[Btn6D] == 1)
 			{
@@ -276,7 +276,7 @@ task ClawLeftTask()
 					ClawHelperLeft(MaxPower);
 				}
 
-				ClawHelperLeft(10);
+				// ClawHelperLeft(10);
 			}
 		}
 	}
@@ -349,7 +349,7 @@ task ClawRightTask()
 			}
 		} else if (vexRT[Btn8U] == 1) {
 
-			int positionOpen = 3100;
+			int positionOpen = 4000;
 
 			if (vexRT[Btn6D] == 1)
 			{
@@ -364,7 +364,7 @@ task ClawRightTask()
 					ClawHelperRight(MaxPower);
 				}
 
-				ClawHelperRight(10);
+				// ClawHelperRight(10);
 			}
 		}
 
@@ -537,7 +537,7 @@ task Lift()
 		{
 			if (vexRT[Btn7U] == 1)
 			{
-				Throw(3000 + 200, 2000 + 300, MaxPower);
+				Throw(3000 + 400, 2000 + 500, MaxPower);
 				// LiftUpAndStop(2600, 120);
 			}
 			else if (vexRT[Btn7D] == 1)
