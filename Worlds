@@ -174,23 +174,39 @@ task Hang()
 				LiftUp(30);
 				wait1Msec(200);
 				LiftUp(0);
-			} 
+			}
 			else if (vexRT[Btn5D] == 1) {
 				LiftDown(20);
 				wait1Msec(50);
 				LiftDown(0);
-				
+
 			}
 		} else if (vexRT[Btn8U] == 1){
 
 			if (vexRT[Btn5U] == 1) {
 				LiftUpAndStop(2300, MaxPower);
 			} else if (vexRT[Btn5D] == 1) {
-				LiftDown(MaxPower);
-				// wait1Msec(5000);
-				// LiftDown(0);
-				// LiftDownAndStop(900,  110);
-				// LiftDown(50);
+				// LiftDown(MaxPower);
+
+				ClawHelper(MaxPower);
+
+				int pValue = 2800;
+				waitUntil(abs(SensorValue[LeftClawPosition]) > pValue || abs(SensorValue[RightClawPosition]) > pValue);
+				StopClaw();
+
+
+				LiftDownAndStop(850,  MaxPower);
+				// LiftDown(MaxPower);
+				// waitUntil(abs(SensorValue[LiftPosition]) < 850);			
+				LiftDown(115);
+				ClawHelper(MaxPower);
+
+				// pValue = 4100;
+				// waitUntil(abs(SensorValue[LeftClawPosition]) > pValue && abs(SensorValue[RightClawPosition]) > pValue);
+				// LiftStop();
+				// StopClaw();
+
+
 			}
 		}
 	}
@@ -474,7 +490,7 @@ void OpenClaw()
 
 void CloseClaw()
 {
-	ClawHelper(-80);
+	ClawHelper(-MaxPower);
 }
 
 void StopClaw()
@@ -640,6 +656,9 @@ void LiftUp(int power)
 void LiftDownAndStop(int distance, int power) {
 
 	while (abs(SensorValue[LiftPosition])>abs(distance)){
+
+		writeDebugStreamLine("LiftDownAndStop) LiftPosition: %d", SensorValue[LiftPosition]);
+
 		LiftDown(power);
 		if (vexRT[Btn8L] == 1)
 		{
