@@ -2,6 +2,7 @@
 #pragma config(Sensor, in2,    LeftClawPosition, sensorPotentiometer)
 #pragma config(Sensor, in3,    RightClawPosition, sensorPotentiometer)
 #pragma config(Sensor, in8,    ExternalBatteryValue, sensorNone)
+#pragma config(Sensor, dgtl2,  LiftTouch,      sensorTouch)
 #pragma config(Motor,  port1,           ClawLeft,      tmotorVex393HighSpeed_HBridge, openLoop)
 #pragma config(Motor,  port2,           WheelLeftOne,  tmotorVex393HighSpeed_MC29, openLoop)
 #pragma config(Motor,  port3,           WheelLeftTwo,  tmotorVex393TurboSpeed_MC29, openLoop)
@@ -197,7 +198,7 @@ task Hang()
 
 				LiftDownAndStop(850,  MaxPower);
 				// LiftDown(MaxPower);
-				// waitUntil(abs(SensorValue[LiftPosition]) < 850);			
+				// waitUntil(abs(SensorValue[LiftPosition]) < 850);
 				LiftDown(115);
 				ClawHelper(MaxPower);
 
