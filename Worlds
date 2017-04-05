@@ -32,7 +32,8 @@
 
 task StopAll();
 task Move();
-task Claw();
+task ClawLeftControl();
+task ClawRightControl();
 task ClawLeftTask();
 task ClawRightTask();
 task Lift();
@@ -46,9 +47,6 @@ void LiftHelper(int power);
 void ClawHelper(int power);
 void ClawHelperLeft(int power);
 void ClawHelperRight(int power);
-
-void OpenClawHelperLeft(int power);
-void OpenClawHelperRight(int power);
 
 void Throw(int distanceLift, int distanceToThrow, int power);
 void LiftDownAndStop(int distance, int power);
@@ -66,6 +64,8 @@ void CloseClaw();
 void StopClaw();
 
 const int MaxPower = 127;
+bool ClawLeftWorking = false;
+bool ClawRightWorking = false;
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -236,6 +236,89 @@ task Hang()
 	}
 }
 
+task ClawLeftControl()
+{
+	long sameTime;
+	int oldPos;
+	int curPos = abs(SensorValue[LeftClawPosition]);
+
+	while (true) {
+		wait1Msec(50);
+
+		while (ClawLeftWorking == true) {
+			oldPos = curPos;
+			curPos = abs(SensorValue[LeftClawPosition]);
+			sameTime = nPgmTime;
+			// writeDebugStreamLine("ClawLeftControl) #1 sameTime updated, oldPos:%d, curPos:%d", oldPos, curPos);
+
+			while (abs(oldPos - curPos) <= 3 ) {
+				// writeDebugStreamLine("ClawLeftControl) #2 nPgmTime:%d, sameTime:%d, abs(nPgmTime - sameTime): %d, oldPos:%d, curPos:%d", nPgmTime, sameTime, abs(nPgmTime - sameTime), oldPos, curPos);
+
+				if (abs(nPgmTime - sameTime) > 1000) {
+					writeDebugStreamLine("ClawLeftControl) Claw Timeout");
+
+					ClawLeftWorking = false;
+					break;
+				}
+
+				if (ClawLeftWorking == false)
+				{
+					writeDebugStreamLine("ClawLeftControl) Claw reach to target");
+					break;
+				}
+
+				oldPos = curPos;
+				curPos = abs(SensorValue[LeftClawPosition]);
+				// writeDebugStreamLine("ClawLeftControl) #3 oldPos:%d, curPos:%d", oldPos, curPos);
+
+			}
+		}
+	}
+}
+
+
+task ClawRightControl()
+{
+	long sameTime;
+	int oldPos;
+	int curPos = abs(SensorValue[RightClawPosition]);
+
+	while (true) {
+		wait1Msec(50);
+
+		while (ClawRightWorking == true) {
+			oldPos = curPos;
+			curPos = abs(SensorValue[RightClawPosition]);
+			sameTime = nPgmTime;
+			// writeDebugStreamLine("ClawRightControl) #1 sameTime updated, oldPos:%d, curPos:%d", oldPos, curPos);
+
+			while (abs(oldPos - curPos) <= 3 ) {
+				// writeDebugStreamLine("ClawRightControl) #2 nPgmTime:%d, sameTime:%d, abs(nPgmTime - sameTime): %d, oldPos:%d, curPos:%d", nPgmTime, sameTime, abs(nPgmTime - sameTime), oldPos, curPos);
+
+				if (abs(nPgmTime - sameTime) > 1000) {
+					writeDebugStreamLine("ClawRightControl) Claw Timeout");
+
+					ClawRightWorking = false;
+					break;
+				}
+
+				if (ClawRightWorking == false)
+				{
+					writeDebugStreamLine("ClawRightControl) Claw reach to target");
+					break;
+				}
+
+				oldPos = curPos;
+				curPos = abs(SensorValue[RightClawPosition]);
+				// writeDebugStreamLine("ClawRightControl) #3 oldPos:%d, curPos:%d", oldPos, curPos);
+
+			}
+		}
+	}
+}
+
+
+
 task ClawLeftTask()
 {
 	while (true)
@@ -261,16 +344,22 @@ task ClawLeftTask()
 
 			if (vexRT[Btn6D] == 1)
 			{
+				ClawLeftWorking = true;
 				// open
 				while (abs(SensorValue[LeftClawPosition])<abs(positionOpen)){
 
+					if (vexRT[Btn8L] == 1 || ClawLeftWorking == false) {
+						writeDebugStreamLine("ClawLeftTask) Open: Claw Timeout");
 
-					if (vexRT[Btn8L] == 1) {
 						break;
 					}
 
 					ClawHelperLeft(MaxPower);
 				}
+
+				writeDebugStreamLine("ClawLeftTask) break");
+
+				ClawLeftWorking = false;
 
 				ClawHelperLeft(10);
 				// if (vexRT[Btn8L] == 1)
@@ -284,66 +373,38 @@ task ClawLeftTask()
 			}
 			else if (vexRT[Btn6U] == 1)
 			{
+				ClawLeftWorking = true;
 				// close
 				while (abs(SensorValue[LeftClawPosition])>abs(700)){
 
 
-					if (vexRT[Btn8L] == 1) {
+					if (vexRT[Btn8L] == 1 || ClawLeftWorking == false) {
+						writeDebugStreamLine("ClawLeftTask) Close: Claw Timeout");
+
 						break;
+
 					}
 
 					ClawHelperLeft(-MaxPower);
 				}
 
+				writeDebugStreamLine("ClawLeftTask) break");
+
+				ClawLeftWorking = false;
+
 				ClawHelperLeft(-30);
 				//MoveHanging(power);
 				//MoveClaw(power);
 			}
-			} else if (vexRT[Btn8U] == 1) {
+		} else if (vexRT[Btn8U] == 1) {
 
 			int positionOpen = 3500;
 
 
 			if (vexRT[Btn6D] == 1)
 			{
-
-
-				long sameTime = 0;
-				int curPos = abs(SensorValue[LeftClawPosition]);
-				int oldPos = -1;
-				bool samePos = false;
-
 				// open
-				while (curPos < abs(positionOpen)){
-
-					// if (oldPos == curPos && abs(nPgmTime - curTime) > 2000) {
-					if (oldPos == curPos && samePos == false) {
-						writeDebugStreamLine("ClawLeftTask) oldPosoldPos == curPos && samePos == false");
-
-						samePos = true;
-						sameTime = nPgmTime;
-					}
-					else if (oldPos == curPos && samePos == true) {
-
-						writeDebugStreamLine("ClawLeftTask) oldPosoldPos == curPos && samePos == true");
-
-
-						// samePos = true;
-						if (abs(nPgmTime - sameTime) > 500) {
-
-							writeDebugStreamLine("ClawLeftTask) abs(nPgmTime - sameTime) > 500");
-
-							break;
-						}
-					}
-					else if (oldPos != curPos) {
-						samePos = false;
-						writeDebugStreamLine("ClawLeftTask) oldPos != curPos");
-
-					}
-
-					oldPos = curPos;
-					curPos = abs(SensorValue[LeftClawPosition]);
+				while (abs(SensorValue[LeftClawPosition])<abs(positionOpen)){
 
 
 					if (vexRT[Btn8L] == 1) {
@@ -354,14 +415,12 @@ task ClawLeftTask()
 				}
 
 				ClawHelperLeft(5);
-
-
-
-				// ClawHelperLeft(10);
 			}
 		}
 	}
 }
+
+
 
 task ClawRightTask()
 {
@@ -379,27 +438,31 @@ task ClawRightTask()
 
 			int positionOpen = 1200;
 
-
-			if (abs(SensorValue[LeftClawPosition]) > 1300) {
+			if (abs(SensorValue[RightClawPosition]) > 1300) {
 				positionOpen = 1800;
 			}
-			// else if (abs(SensorValue[LeftClawPosition]) > 2400) {
+			// else if (abs(SensorValue[RightClawPosition]) > 2400) {
 			// 	positionOpen = 3000;
 			// }
 
-
 			if (vexRT[Btn6D] == 1)
 			{
+				ClawRightWorking = true;
 				// open
 				while (abs(SensorValue[RightClawPosition])<abs(positionOpen)){
 
-					if (vexRT[Btn8L] == 1) {
+					if (vexRT[Btn8L] == 1 || ClawRightWorking == false) {
+						writeDebugStreamLine("ClawRightTask) Open: Claw Timeout");
+
 						break;
 					}
 
 					ClawHelperRight(MaxPower);
-
 				}
+
+				writeDebugStreamLine("ClawRightTask) break");
+
+				ClawRightWorking = false;
 
 				ClawHelperRight(10);
 				// if (vexRT[Btn8L] == 1)
@@ -413,54 +476,39 @@ task ClawRightTask()
 			}
 			else if (vexRT[Btn6U] == 1)
 			{
+				ClawRightWorking = true;
 				// close
 				while (abs(SensorValue[RightClawPosition])>abs(700)){
 
 
-					if (vexRT[Btn8L] == 1) {
+					if (vexRT[Btn8L] == 1 || ClawRightWorking == false) {
+						writeDebugStreamLine("ClawRightTask) Close: Claw Timeout");
+
 						break;
+
 					}
 
 					ClawHelperRight(-MaxPower);
 				}
 
+				writeDebugStreamLine("ClawRightTask) break");
+
+				ClawRightWorking = false;
+
 				ClawHelperRight(-30);
 				//MoveHanging(power);
 				//MoveClaw(power);
 			}
-			} else if (vexRT[Btn8U] == 1) {
+		} else if (vexRT[Btn8U] == 1) {
 
 			int positionOpen = 3500;
 
 
 			if (vexRT[Btn6D] == 1)
 			{
-
-				long sameTime = 0;
-				int curPos = abs(SensorValue[RightClawPosition]);
-				int oldPos = -1;
-				bool samePos = false;
-
 				// open
-				while (curPos < abs(positionOpen)){
+				while (abs(SensorValue[RightClawPosition])<abs(positionOpen)){
 
-
-					if (oldPos == curPos && samePos == false) {
-						samePos = true;
-						sameTime = nPgmTime;
-					}
-					else if (oldPos == curPos && samePos == true) {
-						// samePos = true;
-						if (abs(nPgmTime - sameTime) > 500) {
-							break;
-						}
-					}
-					else if (oldPos != curPos) {
-						samePos = false;
-					}
-
-					oldPos = curPos;
-					curPos = abs(SensorValue[RightClawPosition]);
 
 					if (vexRT[Btn8L] == 1) {
 						break;
@@ -472,105 +520,9 @@ task ClawRightTask()
 				ClawHelperRight(5);
 			}
 		}
-
-
 	}
 }
 
-
-// task Claw_Left()
-// {
-// 	while (true)
-// 	{
-// 		wait1Msec(50);
-
-// 		if (vexRT[Btn6U] == 1)
-// 		{
-
-// 			OpenClawHelperLeft(MaxPower);
-// 			OpenClawHelperRight(MaxPower);
-// 		}
-// 		else if (vexRT[Btn6D] == 1)
-// 		{
-// 			OpenClawHelperLeft(MaxPower);
-// 			OpenClawHelperRight(MaxPower);
-// 		}
-// }
-
-
-// task Claw_Right()
-// {
-// 	while (true)
-// 	{
-// 		wait1Msec(50);
-
-// 		if (vexRT[Btn6U] == 1)
-// 		{
-
-// 			OpenClawHelperLeft(MaxPower);
-// 			OpenClawHelperRight(MaxPower);
-// 		}
-// 		else if (vexRT[Btn6D] == 1)
-// 		{
-// 			OpenClawHelperLeft(MaxPower);
-// 			OpenClawHelperRight(MaxPower);
-// 		}
-// }
-
-task Claw()
-{
-	while (true)
-	{
-		wait1Msec(50);
-
-		if (vexRT[Btn6U] == 1)
-		{
-			OpenClaw();
-			if (vexRT[Btn8L] == 1)
-			{
-				break;
-			}
-
-
-			//MoveHanging(power);
-			//MoveClaw(power);
-		}
-		else if (vexRT[Btn6D] == 1)
-		{
-			CloseClaw();
-			//MoveHanging(power);
-			//MoveClaw(power);
-		}
-	}
-}
-
-
-// void OpenClawHelperLeft(int power)
-// {
-// 	int distance = 1000;
-// 		while (abs(SensorValue[LeftClawPosition])<abs(distance)){
-// 		motor[ClawLeft] = power;
-// 		if (vexRT[Btn8L] == 1)
-// 		{
-// 			break;
-// 		}
-
-// 	}
-// }
-
-
-// void OpenClawHelperRight(int power)
-// {
-// 	int distance = 1000;
-// 		while (abs(SensorValue[RightClawPosition])<abs(distance)){
-// 		motor[ClawRight] = power;
-// 		if (vexRT[Btn8L] == 1)
-// 		{
-// 			break;
-// 		}
-
-// 	}
-// }
 
 void OpenClaw()
 {
@@ -821,6 +773,8 @@ task usercontrol()
 	// User control code here, inside the loop
 
 	startTask(StopAll);
+	startTask(ClawLeftControl);
+	startTask(ClawRightControl);
 	startTask(ClawLeftTask);
 	startTask(ClawRightTask);
 	startTask(Lift);
