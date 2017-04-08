@@ -323,7 +323,7 @@ void ProgrammingSkill_2(){
 	wait1Msec(500);
 	MoveHelper(0);
 
-	
+
 	Throw(3000 + 400, 2000 + 500, MaxPower); // throw three stars #1
 
 	// MoveHelper(-20);
@@ -366,7 +366,7 @@ void ProgrammingSkill_2(){
 	MoveHelper(-40);
 	wait1Msec(globalWaiter * 3);
 	MoveHelper(0);
-	
+
 	Throw(3000 + 400, 2000 + 500, MaxPower); // throw cube #1
 
 	// MoveHelper(-20);
@@ -423,7 +423,7 @@ void ProgrammingSkill_2(){
 	MoveHelper(-40);
 	wait1Msec(globalWaiter);
 	MoveHelper(0);
-	
+
 	Throw(3000 + 400, 2000 + 500, MaxPower); // throw three stars #2
 
 	// MoveHelper(-20);
@@ -649,7 +649,7 @@ task Move()
 	{
 		wait1Msec(50);
 
-		while(testMode == false) {
+		//while(testMode == false) {
 
 			motor[WheelRightOne] = (vexRT[Ch3] - vexRT[Ch1]);
 			motor[WheelLeftOne] = (vexRT[Ch3] + vexRT[Ch1]);
@@ -668,7 +668,7 @@ task Move()
 				// For Hang
 				long startTime = nPgmTime;
 				while(abs(nPgmTime - startTime) < 2000) {
-					MoveHelper(128);
+					MoveHelper(MaxPower);
 					if (vexRT[Btn8L] == 1)
 					{
 						break;
@@ -676,7 +676,7 @@ task Move()
 				}
 				MoveHelper(0);
 			}
-		}
+		//}
 	}
 }
 
@@ -901,7 +901,7 @@ task ClawLeftTask()
 				// close
 				if ((SensorValue[LiftPosition]) < 1500)
 				{
-					LiftDown(10);
+					LiftDown(20);
 				}
 
 				ClawHelperLeft(-MaxPower);
@@ -1139,9 +1139,9 @@ void ClawHelper(int power)
 
 void SetKnockDown()
 {
-	int targetLift = 2250;
+	int targetLift = 1900;
 	int targetLeftClaw = 1500;
-	int targetRightClaw = 1700;
+	int targetRightClaw = 1500;
 	SetPositionHelper(true, targetLift, targetLeftClaw, targetRightClaw);
 }
 
@@ -1241,15 +1241,26 @@ task Lift()
 
 		int targetPosition = 1300;
 
+		if (vexRT[Ch3] > 10) {
+			if ((SensorValue[LiftPosition]) < 1500)
+			{
+				LiftDown(20);
+			}
+		}
+
 		if (SensorValue(LiftPosition) > 1000) {
 			targetPosition = 2100;
 		}
 		if (vexRT[Btn7R] == 1)
 		{
-			testMode = true;
-			ProgrammingSkill();
-			testMode = false;
+			//testMode = true;
+			//ProgrammingSkill();
+			//testMode = false;
 
+		}
+		else if (vexRT[Btn7L] == 1)
+		{
+			SetKnockDown();
 		}
 		else if (vexRT[Btn8R] == 1)
 		{
@@ -1415,6 +1426,10 @@ void LiftDownAndStop(int distance, int power) {
 		}
 	}
 	LiftStop();
+}
+
+void StartClaw(){
+
 }
 
 void LiftDown(int power)
