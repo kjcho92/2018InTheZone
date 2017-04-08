@@ -47,6 +47,8 @@ task Hang();
 
 // Autonomous
 void ProgrammingSkill();
+void ProgrammingSkill_1();
+void ProgrammingSkill_2();
 
 void MoveHelper(int power);
 void MoveValue(int distance, int power);
@@ -84,11 +86,17 @@ void OpenClaw(int power);
 void CloseClaw(int power);
 void StopClaw();
 
+void SetKnockDown();
+void SetPositionHelper(bool increase, int targetLift, int targetLeftClaw, int targetRightClaw);
+void SetPositionClawOnlyHelper(bool increase, int targetLeftClaw, int targetRightClaw);
+
 const int MaxPower = 127;
 bool ClawLeftWorking = false;
 bool ClawRightWorking = false;
 
 int autonomousMode = 1;
+int globalWaiter = 200;
+bool testMode = false;
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -173,47 +181,277 @@ task autonomous()
 	writeDebugStreamLine("autonomous) Time: %d", nPgmTime - startTime);
 }
 
-void ProgrammingSkill_Test(){
-	int goBack = 0;
-	int pValue = 0;
-	
-
-	{ // Open Claw
-		OpenClaw(MaxPower);
-	 	pValue = 400;
-		waitUntil(SensorValue[LeftClawPosition] > pValue || SensorValue[RightClawPosition] > pValue);
-		StopClaw();
-	}
-
-	{ // Open Claw
-		ClawHelperRight(MaxPower);
-
-				writeDebugStreamLine("ProgrammingSkill) ClawHelperRight");
-
-	 	pValue = 1000;
-		waitUntil(SensorValue[RightClawPosition] > pValue);
-		StopClaw();
-				writeDebugStreamLine("ProgrammingSkill) StopClaw");
-	}
-}
 
 void ProgrammingSkill(){
 
-	int goBack = 0;
+
+	long startTime = nPgmTime;
+
+
+	SetKnockDown();
+
+	wait1Msec(globalWaiter);
+
+	MoveForward(1900, 100); //move forward to the wall
+
+	wait1Msec(globalWaiter * 3);
+
+	MoveBackward(200, 70); //move backward to the wall
+
+	wait1Msec(globalWaiter * 3);
+
+	TurnLeft(1500, 60); //90 degrees is around 440
+	// wait1Msec(globalWaiter * 3);
+
+	LiftDownAndStop_Touch_DefaultTimeout(40);
+	LiftDown(10);
+
+	MoveForward(250, 70); //move forward to the wall to pick up
+
+
+	writeDebugStreamLine("autonomous) KnockDown: %d", nPgmTime - startTime);
+
+	ProgrammingSkill_1();
+
+	wait1Msec(globalWaiter * 3);
+
+	ProgrammingSkill_2();
+
+	writeDebugStreamLine("autonomous) Done: %d", nPgmTime - startTime);
+
+
+
+}
+
+void ProgrammingSkill_2(){
 	int pValue = 0;
+	int goBack = 0;
+
+	// LiftUp(30);
+	// 			wait1Msec(0);
+
+	// CloseClaw(MaxPower);
+	// wait1Msec(200);
+
+	// LiftUp(0);
+	// CloseClaw(0);
+
+	SetPositionHelper(false, 800, 400, 400);
+
+	wait1Msec(globalWaiter);
+
+	TurnRight(530, 60); //90 degrees is around 440
+
+	writeDebugStreamLine("ProgrammingSkill) TurnRight");
+
+
+	{	// Move Back
+		goBack = 10;
+		MoveBackward(goBack, 50); //move back from the wall
+
+		writeDebugStreamLine("ProgrammingSkill) MoveBackward");
+	}
+
+
+	LiftDownAndStop_Touch_DefaultTimeout(40);
+	LiftDown(20);
+	writeDebugStreamLine("ProgrammingSkill) LiftDown");
+
+
+	wait1Msec(globalWaiter);
+
+	MoveHelper(70);
+	wait1Msec(400);
+	MoveHelper(0);
+
+
+	SetPositionClawOnlyHelper(true, 900, 1000);
+
+	// { // Open Claw
+	// 	OpenClaw(MaxPower);
+	//  	pValue = 700;
+	// 	waitUntil(SensorValue[LeftClawPosition] > pValue || SensorValue[RightClawPosition] > pValue);
+	// 	StopClaw();
+
+	// 	writeDebugStreamLine("ProgrammingSkill) OpenClaw");
+
+	// }
+
+	wait1Msec(globalWaiter  * 2);
+
+
+
+	{	// Move Forward
+		goBack = 500;
+		MoveForward(goBack, 70); //move back from the wall
+
+		writeDebugStreamLine("ProgrammingSkill) MoveForward");
+	}
+
+
+
+	{ // Close Claw
+		ClawLeftWorking = ClawRightWorking = true;
+		CloseClaw(MaxPower);
+
+		pValue = 800;
+		waitUntil((SensorValue[LeftClawPosition] < pValue || SensorValue[RightClawPosition] < pValue)
+		|| (ClawLeftWorking == false || (ClawRightWorking == false)));
+	}
+
+	wait1Msec(globalWaiter);
+
+	CloseClaw(5);
+
+	TurnLeft(200, 60); //90 degrees is around 440
+
+	wait1Msec(globalWaiter);
+
+	{
+		// Raise and Hold
+		LiftUpAndStop(2000, 85);
+		LiftUp(20);
+	}
+
+	TurnLeft(330, 60); //90 degrees is around 440
+
+	wait1Msec(globalWaiter * 3);
+
+
+
+	MoveHelper(-40);
+	wait1Msec(500);
+	MoveHelper(0);
+
+	
+	Throw(3000 + 400, 2000 + 500, MaxPower); // throw three stars #1
+
+	// MoveHelper(-20);
+	wait1Msec(globalWaiter);
+
 
 	{ // Open Claw
 		OpenClaw(MaxPower);
-	 	pValue = 1800;
+		pValue = 1600;
 		waitUntil(SensorValue[LeftClawPosition] > pValue || SensorValue[RightClawPosition] > pValue);
 		StopClaw();
 	}
 
-	// Lower Lift
-	LiftDownAndStop_Touch_DefaultTimeout(40);
-	LiftDown(10);
+	wait1Msec(globalWaiter);
 
-	for (int i = 0; i < 2; i++) {
+	MoveHelper(30);
+	wait1Msec(globalWaiter);
+
+
+	{ // Close Claw
+		ClawLeftWorking = ClawRightWorking = true;
+		CloseClaw(MaxPower);
+
+		pValue = 800;
+		waitUntil((SensorValue[LeftClawPosition] < pValue || SensorValue[RightClawPosition] < pValue)
+		|| (ClawLeftWorking == false || (ClawRightWorking == false)));
+	}
+
+	wait1Msec(globalWaiter);
+
+	CloseClaw(5);
+
+	{
+		// Raise and Hold
+		LiftUpAndStop(2000, 85);
+		LiftUp(20);
+	}
+
+
+	MoveHelper(-40);
+	wait1Msec(globalWaiter * 3);
+	MoveHelper(0);
+	
+	Throw(3000 + 400, 2000 + 500, MaxPower); // throw cube #1
+
+	// MoveHelper(-20);
+	wait1Msec(globalWaiter);
+
+
+	{ // Open Claw
+		OpenClaw(MaxPower);
+		pValue = 1600;
+		waitUntil(SensorValue[LeftClawPosition] > pValue || SensorValue[RightClawPosition] > pValue);
+		StopClaw();
+	}
+
+	wait1Msec(globalWaiter);
+
+	{	// Move Forward
+		goBack = 320;
+		MoveForward(goBack, 100); //move forward to wall to pick up
+	}
+
+	wait1Msec(globalWaiter);
+
+
+	{ // Close Claw
+		ClawLeftWorking = ClawRightWorking = true;
+		CloseClaw(MaxPower);
+
+		pValue = 800;
+		waitUntil((SensorValue[LeftClawPosition] < pValue || SensorValue[RightClawPosition] < pValue)
+		|| (ClawLeftWorking == false || (ClawRightWorking == false)));
+	}
+
+	wait1Msec(globalWaiter * 2);
+
+
+	CloseClaw(5);
+
+	{	// Move Back
+		goBack = 50;
+		MoveBackward(goBack, 100); //move back from the wall
+	}
+
+	{
+		// Raise and Hold
+		LiftUpAndStop(2000, 85);
+		LiftUp(20);
+	}
+
+	{	// Move Back
+		MoveBackward(400, 100); //move back to fence to throw
+	}
+
+
+	MoveHelper(-40);
+	wait1Msec(globalWaiter);
+	MoveHelper(0);
+	
+	Throw(3000 + 400, 2000 + 500, MaxPower); // throw three stars #2
+
+	// MoveHelper(-20);
+	wait1Msec(globalWaiter);
+
+
+}
+
+void ProgrammingSkill_1(){
+
+
+	long startTime = nPgmTime;
+
+	int goBack = 0;
+	int pValue = 0;
+
+	// { // Open Claw
+	// 	OpenClaw(MaxPower);
+	//  	pValue = 1800;
+	// 	waitUntil(SensorValue[LeftClawPosition] > pValue || SensorValue[RightClawPosition] > pValue);
+	// 	StopClaw();
+	// }
+
+	// // Lower Lift
+	// LiftDownAndStop_Touch_DefaultTimeout(40);
+	// LiftDown(10);
+
+	for (int i = 0; i < 3; i++) {
 
 		wait1Msec(1000);
 
@@ -226,7 +464,15 @@ void ProgrammingSkill(){
 			|| (ClawLeftWorking == false || (ClawRightWorking == false)));
 		}
 
-		wait1Msec(1000);
+		wait1Msec(globalWaiter * 2);
+
+		int powerClaw = 5;
+
+		if (i == 0) {
+			powerClaw = 10;
+		}
+
+		CloseClaw(powerClaw);
 
 		{	// Move Back
 			goBack = 50;
@@ -235,129 +481,56 @@ void ProgrammingSkill(){
 
 		{
 			// Raise and Hold
-			LiftUpAndStop(2000, 65);
+			LiftUpAndStop(2000, 85);
 			LiftUp(20);
 		}
 
 		{	// Move Back
-			goBack = 280;
+			goBack = 400;
 			if (i == 0) {
-				goBack = 400;
+				goBack = 1000;
 			}
 
-			MoveBackward(goBack, 100); //move back to fence
+			MoveBackward(goBack, 100); //move back to fence to throw
 		}
 
-		wait1Msec(1000);
+
+		MoveHelper(-40);
+		wait1Msec(globalWaiter);
+		MoveHelper(0);
 
 		// Throw
 		Throw(3000 + 400, 2000 + 500, MaxPower);
 
-		if (i == 0) {
+		// MoveHelper(-10);
+
+
+		writeDebugStreamLine("autonomous) throw: %d, index: %d", nPgmTime - startTime, i);
+
+		if (i < 2) {
 			{ // Open Claw
 				OpenClaw(MaxPower);
-			 	pValue = 1600;
+				pValue = 1600;
 				waitUntil(SensorValue[LeftClawPosition] > pValue || SensorValue[RightClawPosition] > pValue);
 				StopClaw();
 			}
 
-			wait1Msec(1000);
+
+			writeDebugStreamLine("ProgrammingSkill) OpenClaw, index:%d", i);
+
+
+			// wait1Msec(500);
+			// wait1Msec(500);
 
 			{	// Move Back
-				goBack = 90;
-				MoveForward(goBack, 100); //move forward to wall
+				goBack = 200;
+				MoveForward(goBack, 100); //move forward to wall to pick up
 			}
+
+
+			writeDebugStreamLine("ProgrammingSkill) MoveForward, index:%d", i);
 		}
 	}
-
-
-	wait1Msec(1000);
-
-	{ // Close Claw
-		ClawLeftWorking = ClawRightWorking = true;
-		CloseClaw(MaxPower);
-
-		pValue = 1000;
-		waitUntil((SensorValue[LeftClawPosition] < pValue || SensorValue[RightClawPosition] < pValue)
-		|| (ClawLeftWorking == false || (ClawRightWorking == false)));
-	}
-
-	LiftDownAndStop_Touch_DefaultTimeout(20);
-	// LiftUpAndStop(1400, 20);
-
-
-	writeDebugStreamLine("ProgrammingSkill) LiftDownAndStop_Touch_DefaultTimeout");
-
-	MoveForward(10, 60); //move forward so that we don't hit the fence post
-
-	writeDebugStreamLine("ProgrammingSkill) MoveForward");
-
-	wait1Msec(1000);
-
-	TurnRight(600, 60); //90 degrees is around 440
-
-		writeDebugStreamLine("ProgrammingSkill) TurnRight");
-
-	wait1Msec(1000);
-
-	LiftDown(20);
-
-		writeDebugStreamLine("ProgrammingSkill) LiftDown");
-
-	{ // Open Claw
-		OpenClaw(MaxPower);
-	 	pValue = 500;
-		waitUntil(SensorValue[LeftClawPosition] > pValue || SensorValue[RightClawPosition] > pValue);
-		StopClaw();
-	}
-
-	// { // Open Claw
-	// 	ClawHelperRight(MaxPower);
-
-	// 			writeDebugStreamLine("ProgrammingSkill) ClawHelperRight");
-
-	//  	pValue = 1000;
-	// 	waitUntil(SensorValue[RightClawPosition] > pValue);
-	// 	StopClaw();
-	// 			writeDebugStreamLine("ProgrammingSkill) StopClaw");
-	// }
-
-	LiftDown(20);
-
-	MoveForward(200, 120); //move forward so that we don't hit the fence post
-		writeDebugStreamLine("ProgrammingSkill) MoveForward");
-
-	wait1Msec(1000);
-
-	{ // Close Claw
-		ClawLeftWorking = ClawRightWorking = true;
-		ClawHelperRight(-MaxPower);
-
-			writeDebugStreamLine("ProgrammingSkill) CloseClaw_1");
-
-		pValue = 800;
-		waitUntil((SensorValue[RightClawPosition] < pValue)
-		|| (ClawRightWorking == false));
-	}
-
-
-		writeDebugStreamLine("ProgrammingSkill) CloseClaw_2");
-
-	wait1Msec(1000);
-
-	{
-		// Raise and Hold
-		LiftUpAndStop(2000, 65);
-		LiftUp(20);
-	}
-
-	wait1Msec(1000);
-
-	TurnLeft(600, 60); //90 degrees is around 440
-	wait1Msec(1000);
-
-	// Throw
-	Throw(3000 + 400, 2000 + 500, MaxPower);
 }
 
 void MoveHelper(int power)
@@ -476,19 +649,23 @@ task Move()
 	{
 		wait1Msec(50);
 
-		motor[WheelRightOne] = (vexRT[Ch3] - vexRT[Ch1]);
-		motor[WheelLeftOne] = (vexRT[Ch3] + vexRT[Ch1]);
-		motor[WheelRightTwo] = (vexRT[Ch3] - vexRT[Ch1]);
-		motor[WheelLeftTwo] = (vexRT[Ch3] + vexRT[Ch1]);
+		while(testMode == false) {
+
+			motor[WheelRightOne] = (vexRT[Ch3] - vexRT[Ch1]);
+			motor[WheelLeftOne] = (vexRT[Ch3] + vexRT[Ch1]);
+			motor[WheelRightTwo] = (vexRT[Ch3] - vexRT[Ch1]);
+			motor[WheelLeftTwo] = (vexRT[Ch3] + vexRT[Ch1]);
 
 
-		if (abs(motor[WheelRightOne]) < 15)
-		{
-			MoveHelper(0);
+			if (abs(motor[WheelRightOne]) < 15)
+			{
+				MoveHelper(0);
+			}
 		}
 
 		if (vexRT[Btn8U] == 1) {
 			if (vexRT[Btn5D] == 1) {
+				// For Hang
 				long startTime = nPgmTime;
 				while(abs(nPgmTime - startTime) < 2000) {
 					MoveHelper(128);
@@ -531,7 +708,7 @@ task Hang()
 				LiftDown(0);
 
 			}
-		} else if (vexRT[Btn8U] == 1) {
+			} else if (vexRT[Btn8U] == 1) {
 
 			if (vexRT[Btn5U] == 1) {
 				LiftUpAndStop(2500, MaxPower);
@@ -540,7 +717,7 @@ task Hang()
 
 				ClawHelper(MaxPower);
 
-			 	int pValue = 2800;
+				int pValue = 2800;
 				waitUntil(abs(SensorValue[LeftClawPosition]) > pValue || abs(SensorValue[RightClawPosition]) > pValue);
 				StopClaw();
 
@@ -568,7 +745,7 @@ task Hang()
 
 				pValue = 3350;
 				waitUntil((abs(SensorValue[LeftClawPosition]) > pValue || abs(SensorValue[RightClawPosition]) > pValue)
-					|| (ClawLeftWorking == false || (ClawRightWorking == false)));
+				|| (ClawLeftWorking == false || (ClawRightWorking == false)));
 
 				ClawHelper(5);
 				wait1Msec(500);
@@ -721,6 +898,18 @@ task ClawLeftTask()
 			}
 			else if (vexRT[Btn6U] == 1)
 			{
+				// close
+				if ((SensorValue[LiftPosition]) < 1500)
+				{
+					LiftDown(10);
+				}
+
+				ClawHelperLeft(-MaxPower);
+				wait1Msec(120);
+				ClawHelperLeft(-20);
+			}
+			else if (vexRT[Btn6U] == 5)
+			{
 				ClawLeftWorking = true;
 				// close
 				while (abs(SensorValue[LeftClawPosition])>abs(700)){
@@ -744,7 +933,7 @@ task ClawLeftTask()
 				//MoveHanging(power);
 				//MoveClaw(power);
 			}
-		} else if (vexRT[Btn8U] == 1) {
+			} else if (vexRT[Btn8U] == 1) {
 
 			int positionOpen = 0;
 			int holdPower = 0;
@@ -836,6 +1025,19 @@ task ClawRightTask()
 				//MoveClaw(power);
 			}
 			else if (vexRT[Btn6U] == 1)
+			{
+				// close
+
+				if ((SensorValue[LiftPosition]) < 1500)
+				{
+					LiftDown(10);
+				}
+
+				ClawHelperRight(-MaxPower);
+				wait1Msec(120);
+				ClawHelperRight(-20);
+			}
+			else if (vexRT[Btn6U] == 5)
 			{
 				ClawRightWorking = true;
 				// close
@@ -933,6 +1135,103 @@ void ClawHelper(int power)
 	motor[ClawLeft] = power;
 }
 
+// void SetKnockDown()
+
+void SetKnockDown()
+{
+	int targetLift = 2250;
+	int targetLeftClaw = 1500;
+	int targetRightClaw = 1700;
+	SetPositionHelper(true, targetLift, targetLeftClaw, targetRightClaw);
+}
+
+
+void SetPositionClawOnlyHelper(bool increase, int targetLeftClaw, int targetRightClaw)
+{
+	// Up slowly lift
+	// int powerLift = 70;
+
+	int power = (increase)? MaxPower : -MaxPower;
+
+	while(true)
+	{
+		ClawHelper(power);
+
+		if (increase) {
+			if (SensorValue[LeftClawPosition] > targetLeftClaw) {
+				ClawHelperLeft(0);
+			}
+
+			if (SensorValue[RightClawPosition] > targetRightClaw) {
+				ClawHelperRight(0);
+			}
+		}
+		else
+		{
+			if (SensorValue[LeftClawPosition] < targetLeftClaw) {
+				ClawHelperLeft(0);
+			}
+
+			if (SensorValue[RightClawPosition] < targetRightClaw) {
+				ClawHelperRight(0);
+			}
+		}
+
+		if ((motor[ClawLeft] == 0 && motor[ClawRight] == 0 ) || vexRT[Btn8L] == 1) {
+			break;
+		}
+
+	}
+
+
+}
+
+void SetPositionHelper(bool increase, int targetLift, int targetLeftClaw, int targetRightClaw)
+{
+	// Up slowly lift
+	// int powerLift = 70;
+
+	int power = (increase)? MaxPower : -MaxPower;
+
+	while(true)
+	{
+		ClawHelper(power);
+		LiftUp(MaxPower);
+
+
+		if (increase) {
+			if (SensorValue[LeftClawPosition] > targetLeftClaw) {
+				ClawHelperLeft(0);
+			}
+
+			if (SensorValue[RightClawPosition] > targetRightClaw) {
+				ClawHelperRight(0);
+			}
+		}
+		else
+		{
+			if (SensorValue[LeftClawPosition] < targetLeftClaw) {
+				ClawHelperLeft(0);
+			}
+
+			if (SensorValue[RightClawPosition] < targetRightClaw) {
+				ClawHelperRight(0);
+			}
+		}
+
+		if (SensorValue(LiftPosition) > targetLift) {
+			LiftUp(0);
+		}
+
+		if ((motor[ClawLeft] == 0 && motor[ClawRight] == 0 && motor[Lift_L1] == 0) || vexRT[Btn8L] == 1) {
+			break;
+		}
+
+	}
+
+
+}
+
 task Lift()
 {
 	while (true)
@@ -943,12 +1242,22 @@ task Lift()
 		int targetPosition = 1300;
 
 		if (SensorValue(LiftPosition) > 1000) {
-			targetPosition = 2000;
+			targetPosition = 2100;
 		}
-		if (vexRT[Btn8R] == 1)
+		if (vexRT[Btn7R] == 1)
+		{
+			testMode = true;
+			ProgrammingSkill();
+			testMode = false;
+
+		}
+		else if (vexRT[Btn8R] == 1)
 		{
 			// Up slowly lift
-			int powerLift = 65;
+			int powerLift = 75;
+
+			// CloseClaw(20);
+
 			while (SensorValue(LiftPosition) < targetPosition/*&&(vexRT[Btn7U]==0)*/){
 				//if (vexRT[Btn7U]==1){
 				//	MoveLift(100);
@@ -963,9 +1272,7 @@ task Lift()
 
 			LiftUp(20);
 		}
-
-
-		if (vexRT[Btn8U] == 0)
+		else if (vexRT[Btn8U] == 0)
 		{
 			if (vexRT[Btn7U] == 1)
 			{
@@ -998,8 +1305,7 @@ task Lift()
 
 void Throw(int distanceLift, int distanceToThrow, int power){
 
-
-	ClawHelper(-20);
+	// CloseClaw(10);
 
 	while (abs(SensorValue[LiftPosition])<abs(distanceLift)){
 		LiftUp(power);
