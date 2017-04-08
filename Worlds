@@ -49,6 +49,7 @@ task Hang();
 void ProgrammingSkill();
 void ProgrammingSkill_1();
 void ProgrammingSkill_2();
+void ProgrammingSkill_3();
 
 void MoveHelper(int power);
 void MoveValue(int distance, int power);
@@ -196,7 +197,7 @@ void ProgrammingSkill(){
 
 	wait1Msec(globalWaiter * 3);
 
-	MoveBackward(200, 70); //move backward to the wall
+	MoveBackward(100, 70); //move backward to the wall
 
 	wait1Msec(globalWaiter * 3);
 
@@ -213,11 +214,154 @@ void ProgrammingSkill(){
 
 	ProgrammingSkill_1();
 
-	wait1Msec(globalWaiter * 3);
+
+	writeDebugStreamLine("autonomous) ProgrammingSkill_1: %d", nPgmTime - startTime);
+
+	wait1Msec(globalWaiter * 2);
 
 	ProgrammingSkill_2();
 
+	writeDebugStreamLine("autonomous) ProgrammingSkill_2: %d", nPgmTime - startTime);
+
+	wait1Msec(globalWaiter * 2);
+
+	ProgrammingSkill_3()
+
 	writeDebugStreamLine("autonomous) Done: %d", nPgmTime - startTime);
+
+}
+
+void ProgrammingSkill_3(){
+
+	int pValue = 0;
+	int goBack = 0;
+
+	SetPositionHelper(false, 800, 400, 400);
+
+	wait1Msec(globalWaiter);
+
+	TurnRight(530, 60); //90 degrees is around 440
+
+	writeDebugStreamLine("ProgrammingSkill) TurnRight");
+
+
+	LiftDownAndStop_Touch_DefaultTimeout(40);
+	LiftDown(20);
+	writeDebugStreamLine("ProgrammingSkill) LiftDown");
+
+	wait1Msec(globalWaiter);
+
+
+	{	// Move Forward
+		goBack = 150;
+		MoveForward(goBack, 70); //move back from the wall
+
+		writeDebugStreamLine("ProgrammingSkill) MoveForward");
+	}
+
+
+
+	SetPositionClawOnlyHelper(true, 1000, 1000);
+
+	writeDebugStreamLine("ProgrammingSkill) SetPositionClawOnlyHelper");
+
+
+	// wait1Msec(globalWaiter  * 2);
+
+
+	{	// Move Forward
+		goBack = 100;
+		MoveForward(goBack, 70); //move back from the wall
+
+		writeDebugStreamLine("ProgrammingSkill) MoveForward");
+	}
+
+
+	{ // Close Claw
+		ClawLeftWorking = ClawRightWorking = true;
+		CloseClaw(MaxPower);
+
+		pValue = 800;
+		waitUntil((SensorValue[LeftClawPosition] < pValue || SensorValue[RightClawPosition] < pValue)
+		|| (ClawLeftWorking == false || (ClawRightWorking == false)));
+	}
+
+	wait1Msec(globalWaiter);
+
+	CloseClaw(5);
+
+
+	MoveHelper(-50);
+	wait1Msec(globalWaiter * 2);
+	MoveHelper(0);
+
+
+	wait1Msec(globalWaiter);
+
+
+
+
+	TurnLeft(750, 60); //90 degrees is around 440
+
+	wait1Msec(globalWaiter * 2);
+
+
+
+	{ // Open Claw
+		OpenClaw(MaxPower);
+		pValue = 2000;
+		waitUntil(SensorValue[LeftClawPosition] > pValue || SensorValue[RightClawPosition] > pValue);
+		StopClaw();
+	}
+
+	wait1Msec(globalWaiter);
+
+	{	// Move Forward
+		goBack = 600;
+		MoveForward(goBack, 100); //move forward to pick up star #1
+	}
+
+	wait1Msec(globalWaiter);
+
+
+	{ // Close Claw
+		ClawLeftWorking = ClawRightWorking = true;
+		CloseClaw(MaxPower);
+
+		pValue = 800;
+		waitUntil((SensorValue[LeftClawPosition] < pValue || SensorValue[RightClawPosition] < pValue)
+		|| (ClawLeftWorking == false || (ClawRightWorking == false)));
+	}
+
+	wait1Msec(globalWaiter * 2);
+
+
+	CloseClaw(20);
+
+	{	// Move Back
+		goBack = 50;
+		MoveBackward(goBack, 100); //move back from the wall
+	}
+
+	{
+		// Raise and Hold
+		LiftUpAndStop(2000, 85);
+		LiftUp(20);
+	}
+
+	{	// Move Back
+		MoveBackward(450, 100); //move back to fence to throw
+	}
+
+
+	MoveHelper(-40);
+	wait1Msec(globalWaiter);
+	MoveHelper(0);
+
+	Throw(3000 + 400, 2000 + 500, MaxPower); // throw two stars and cube
+
+	// MoveHelper(-20);
+	wait1Msec(globalWaiter);
 
 
 
@@ -226,15 +370,6 @@ void ProgrammingSkill(){
 void ProgrammingSkill_2(){
 	int pValue = 0;
 	int goBack = 0;
-
-	// LiftUp(30);
-	// 			wait1Msec(0);
-
-	// CloseClaw(MaxPower);
-	// wait1Msec(200);
-
-	// LiftUp(0);
-	// CloseClaw(0);
 
 	SetPositionHelper(false, 800, 400, 400);
 
@@ -261,28 +396,20 @@ void ProgrammingSkill_2(){
 	wait1Msec(globalWaiter);
 
 	MoveHelper(70);
-	wait1Msec(400);
+	wait1Msec(350);
 	MoveHelper(0);
 
+	wait1Msec(globalWaiter * 3);
 
-	SetPositionClawOnlyHelper(true, 900, 1000);
 
-	// { // Open Claw
-	// 	OpenClaw(MaxPower);
-	//  	pValue = 700;
-	// 	waitUntil(SensorValue[LeftClawPosition] > pValue || SensorValue[RightClawPosition] > pValue);
-	// 	StopClaw();
-
-	// 	writeDebugStreamLine("ProgrammingSkill) OpenClaw");
-
-	// }
+	SetPositionClawOnlyHelper(true, 800, 800);
 
 	wait1Msec(globalWaiter  * 2);
 
 
 
 	{	// Move Forward
-		goBack = 500;
+		goBack = 250;
 		MoveForward(goBack, 70); //move back from the wall
 
 		writeDebugStreamLine("ProgrammingSkill) MoveForward");
@@ -434,22 +561,10 @@ void ProgrammingSkill_2(){
 
 void ProgrammingSkill_1(){
 
-
 	long startTime = nPgmTime;
 
 	int goBack = 0;
 	int pValue = 0;
-
-	// { // Open Claw
-	// 	OpenClaw(MaxPower);
-	//  	pValue = 1800;
-	// 	waitUntil(SensorValue[LeftClawPosition] > pValue || SensorValue[RightClawPosition] > pValue);
-	// 	StopClaw();
-	// }
-
-	// // Lower Lift
-	// LiftDownAndStop_Touch_DefaultTimeout(40);
-	// LiftDown(10);
 
 	for (int i = 0; i < 3; i++) {
 
@@ -469,7 +584,7 @@ void ProgrammingSkill_1(){
 		int powerClaw = 5;
 
 		if (i == 0) {
-			powerClaw = 10;
+			powerClaw = 20;
 		}
 
 		CloseClaw(powerClaw);
@@ -649,7 +764,7 @@ task Move()
 	{
 		wait1Msec(50);
 
-		//while(testMode == false) {
+		while(testMode == false) {
 
 			motor[WheelRightOne] = (vexRT[Ch3] - vexRT[Ch1]);
 			motor[WheelLeftOne] = (vexRT[Ch3] + vexRT[Ch1]);
@@ -661,22 +776,24 @@ task Move()
 			{
 				MoveHelper(0);
 			}
-		}
 
-		if (vexRT[Btn8U] == 1) {
-			if (vexRT[Btn5D] == 1) {
-				// For Hang
-				long startTime = nPgmTime;
-				while(abs(nPgmTime - startTime) < 2000) {
-					MoveHelper(MaxPower);
-					if (vexRT[Btn8L] == 1)
-					{
-						break;
+
+			if (vexRT[Btn8U] == 1) {
+				if (vexRT[Btn5D] == 1) {
+					// For Hang
+					long startTime = nPgmTime;
+					while(abs(nPgmTime - startTime) < 2000) {
+						MoveHelper(MaxPower);
+						if (vexRT[Btn8L] == 1)
+						{
+							break;
+						}
 					}
+					MoveHelper(0);
 				}
-				MoveHelper(0);
+			//}
 			}
-		//}
+		}
 	}
 }
 
@@ -1253,9 +1370,9 @@ task Lift()
 		}
 		if (vexRT[Btn7R] == 1)
 		{
-			//testMode = true;
-			//ProgrammingSkill();
-			//testMode = false;
+			testMode = true;
+			ProgrammingSkill();
+			testMode = false;
 
 		}
 		else if (vexRT[Btn7L] == 1)
