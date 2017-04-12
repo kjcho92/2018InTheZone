@@ -222,9 +222,9 @@ void ProgrammingSkill(){
 	wait1Msec(globalWaiter * 3);
 	MoveBackward(100, 70); //move backward to the wall
 	wait1Msec(globalWaiter * 3);
-	TurnLeft(1500, 60); //90 degrees is around 440
+	TurnLeft(1500, 60); //200 degree, 90 degrees is around 440
 	LiftDownAndStopAuto();
-	MoveForward(250, 70); //move forward to the wall to pick up
+	MoveForward(200, 70); //move forward to the wall to pick up
 	writeDebugStreamLine("autonomous) KnockDown: %d", nPgmTime - startTime);
 	ProgrammingSkill_1();
 	writeDebugStreamLine("autonomous) ProgrammingSkill_1: %d", nPgmTime - startTime);
@@ -264,8 +264,7 @@ void ProgrammingSkill_1(){
 			MoveBackward(goBack, 100); //move back to fence to throw
 		}
 
-		MoveHelperAuto(-20, globalWaiter);
-		Throw(3000 + 400, 2000 + 500, MaxPower);
+		ThrowAuto(globalWaiter);
 		writeDebugStreamLine("autonomous) throw: %d, index: %d", nPgmTime - startTime, i);
 
 		if (i < 2) {
@@ -364,7 +363,7 @@ void ProgrammingSkill_3(){
 }
 
 void ThrowAuto(int delay) {
-	MoveHelperAuto(-40, delay);
+	MoveHelperAuto(-20, delay);
 	Throw(3000 + 400, 2000 + 500, MaxPower);
 	wait1Msec(globalWaiter);
 }
@@ -530,8 +529,8 @@ task Move()
 			motor[WheelLeftTwo] = (vexRT[Ch3] + vexRT[Ch1]);
 
 
-			if (abs(motor[WheelRightOne]) < 15)
-			{
+			if (abs(motor[WheelRightOne]) < 15 || abs(motor[WheelLeftOne]) < 15 ||
+				abs(motor[WheelRightTwo]) < 15 || abs(motor[WheelLeftTwo]) < 15) {
 				MoveHelper(0);
 			}
 
@@ -746,7 +745,7 @@ task ClawLeftTask()
 			{
 				if ((SensorValue[LiftPosition]) < 1500)
 				{
-					LiftDown(20);
+					// LiftDown(20);
 				}
 
 
@@ -782,7 +781,7 @@ task ClawLeftTask()
 				// close
 				if ((SensorValue[LiftPosition]) < 1500)
 				{
-					LiftDown(20);
+					// LiftDown(20);
 				}
 
 				int powerLocal = -MaxPower;
@@ -887,7 +886,7 @@ task ClawRightTask()
 
 				if ((SensorValue[LiftPosition]) < 1500)
 				{
-					LiftDown(20);
+					// LiftDown(20);
 				}
 
 				ClawRightWorking = true;
@@ -923,7 +922,7 @@ task ClawRightTask()
 
 				if ((SensorValue[LiftPosition]) < 1500)
 				{
-					LiftDown(20);
+					// LiftDown(20);
 				}
 
 				int powerLocal = -MaxPower;
@@ -1046,8 +1045,8 @@ void DeployClaw()
 void SetKnockDown()
 {
 	int targetLift = 1900;
-	int targetLeftClaw = 1500;
-	int targetRightClaw = 1500;
+	int targetLeftClaw = 1300;
+	int targetRightClaw = 1400;
 	SetPositionHelper(true, targetLift, targetLeftClaw, targetRightClaw);
 }
 
@@ -1145,7 +1144,6 @@ task Lift()
 		wait1Msec(50);
 
 
-		int targetPosition = 1300;
 
 		if (vexRT[Ch3] > 10) {
 			if ((SensorValue[LiftPosition]) < 1500)
@@ -1154,9 +1152,6 @@ task Lift()
 			}
 		}
 
-		if (SensorValue(LiftPosition) > 1000) {
-			targetPosition = 2100;
-		}
 		if (vexRT[Btn7R] == 1)
 		{
 			// testMode = true;
@@ -1171,7 +1166,15 @@ task Lift()
 		else if (vexRT[Btn8R] == 1)
 		{
 			// Up slowly lift
-			int powerLift = 75;
+			// int powerLift = 75;
+			// int targetPosition = 1300;
+
+			int powerLift = MaxPower;
+			int targetPosition = 1000;
+
+			if (SensorValue(LiftPosition) > 1000) {
+				targetPosition = 1600;
+			}
 
 			// CloseClaw(20);
 
@@ -1201,7 +1204,7 @@ task Lift()
 			{
 				// Down lift
 				// LiftDownAndStop(900,  40);
-				LiftDownAndStop_Touch_DefaultTimeout(40);
+				LiftDownAndStop_Touch_DefaultTimeout(60);
 				LiftDown(10);
 			}
 		}
@@ -1239,7 +1242,7 @@ void Throw(int distanceLift, int distanceToThrow, int power){
 
 	LiftStop();
 	StopClaw();
-	LiftDownAndStop_Touch_DefaultTimeout(40);
+	LiftDownAndStop_Touch_DefaultTimeout(60);
 	LiftDown(10);
 }
 
