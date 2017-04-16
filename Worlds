@@ -43,12 +43,14 @@ task Hang();
 
 // Autonomous
 void Autonomous_Accel();
+void Autonomous_AccelTwo();
 void ProgrammingSkill();
-void ProgrammingSkill_1();
+void ProgrammingSkill_1(int iteration);
 void ProgrammingSkill_2();
 void ProgrammingSkill_3();
 
 void ThrowAuto(int delay);
+void ThrowAutoAlt(int delay);
 void LiftUpAuto(int distance, int power);
 void LiftDownAndStopAuto();
 void MoveHelperAuto(int power, int delay);
@@ -77,6 +79,8 @@ void ClawHelperLeft(int power);
 void ClawHelperRight(int power);
 
 void Throw(int distanceLift, int distanceToThrow, int power);
+void ThrowAlt(int distanceLift, int distanceToThrow, int power);
+void ThrowStay(int distanceLift, int distanceToThrow, int power);
 void LiftDownAndStop(int distance, int power);
 void LiftDownAndStop_Touch_DefaultTimeout(int power);
 void LiftDownAndStop_Touch(int power, int timemout);
@@ -152,7 +156,7 @@ task autonomous()
 
 	// LockWheel(); // LockWheel should be in the pre_auto
 
-	autonomousMode = 1;
+	autonomousMode = 2;
 
 	if (autonomousMode == 1)
 	{
@@ -160,7 +164,7 @@ task autonomous()
 	}
 	else if (autonomousMode == 2)
 	{
-		// Autonomous_IEM();
+		Autonomous_AccelTwo();
 	}
 	else if (autonomousMode == 3)
 	{
@@ -211,11 +215,11 @@ void Autonomous_Accel() {
 	CloseClawAuto(); //grab the cube
 
 
-	LiftUpAuto(1400, 65); //hold lift up
+	LiftUpAuto(1400, 80); //hold lift up
 	LiftUp(0);
-	MoveForward(180, 40); //just a bit to align with stars
+	MoveForward(180, 80); //just a bit to align with stars
 	wait1Msec(500);
-	TurnLeft(550, 60); //rotate to fence
+	TurnLeft(525, 100); //rotate to fence
 	MoveBackward(350, 60);
 	Throw(3000 + 400, 2000 + 500, MaxPower);
 	OpenClawAuto(1500);
@@ -224,11 +228,30 @@ void Autonomous_Accel() {
 	LiftDown(15);
 	wait1Msec(500);
 	CloseClawAuto();
-	wait1Msec(1000);
+	wait1Msec(500);
 	MoveBackward(50, 50); //a bit to not get stuck on wall
 	LiftUpAuto(2000, 85); //hold lift up
 	MoveBackward(300, 100); //to the fence
 	Throw(3000 + 400, 2000 + 500, MaxPower);
+	/*ThrowStay(3000 + 400, 2000 + 500, MaxPower);
+	LiftDownAndStop(3400, 20);
+	OpenClawAuto(1600);*/
+}
+
+void Autonomous_AccelTwo() {
+	DeployClaw();
+	wait1Msec(500);
+
+	SetKnockDown();
+	wait1Msec(globalWaiter);
+	MoveForward(1500, 100); //move forward to the wall
+	wait1Msec(globalWaiter * 3);
+	MoveBackward(100, 70); //move backward to the wall
+	wait1Msec(globalWaiter * 3);
+	TurnLeft(1500, 60); //200 degree, 90 degrees is around 440
+	LiftDownAndStopAuto();
+	MoveForward(200, 70); //move forward to the wall to pick up
+	ProgrammingSkill_1(1);
 }
 
 void ProgrammingSkill(){
@@ -247,7 +270,7 @@ void ProgrammingSkill(){
 	LiftDownAndStopAuto();
 	MoveForward(200, 70); //move forward to the wall to pick up
 	writeDebugStreamLine("autonomous) KnockDown: %d", nPgmTime - startTime);
-	ProgrammingSkill_1();
+	ProgrammingSkill_1(3);
 	writeDebugStreamLine("autonomous) ProgrammingSkill_1: %d", nPgmTime - startTime);
 	wait1Msec(globalWaiter * 2);
 	ProgrammingSkill_2();
@@ -273,7 +296,7 @@ void ProgrammingSkill_Test(){
 
 	writeDebugStreamLine("autonomous) Ready: %d", nPgmTime - startTime);
 
-	ProgrammingSkill_1();
+	ProgrammingSkill_1(3);
 	writeDebugStreamLine("autonomous) ProgrammingSkill_1: %d", nPgmTime - startTime);
 	wait1Msec(globalWaiter * 2);
 	ProgrammingSkill_2();
@@ -283,11 +306,11 @@ void ProgrammingSkill_Test(){
 	writeDebugStreamLine("autonomous) Done: %d", nPgmTime - startTime);
 }
 
-void ProgrammingSkill_1(){
+void ProgrammingSkill_1(int iteration){
 	long startTime = nPgmTime;
 	int goBack = 0;
 
-	int iteration = 3;	
+	//int iteration = 3;
 	for (int i = 0; i < iteration; i++) {
 
 		wait1Msec(1000);
@@ -312,7 +335,7 @@ void ProgrammingSkill_1(){
 		{	// Move Back
 			goBack = 400;
 			if (i == 0) {
-				goBack = 1000;
+				goBack = 1000 - 600;
 			}
 
 			MoveBackward(goBack, 100); //move back to fence to throw
@@ -322,7 +345,12 @@ void ProgrammingSkill_1(){
 		writeDebugStreamLine("ProgrammingSkill) throw: %d, index: %d", nPgmTime - startTime, i);
 
 		if (i < (iteration - 1)) {
-			OpenClawAuto(1600);
+			if (i == 1) {
+				OpenClawAuto(1500);
+			}
+			else {
+				OpenClawAuto(1600);
+			}
 			writeDebugStreamLine("ProgrammingSkill) OpenClaw, index:%d", i);
 			MoveForward(200, 100); //move forward to wall to pick up
 			writeDebugStreamLine("ProgrammingSkill) MoveForward, index:%d", i);
@@ -333,37 +361,37 @@ void ProgrammingSkill_1(){
 void ProgrammingSkill_2(){
 	SetPositionHelper(false, 800, 400, 400);
 	wait1Msec(globalWaiter);
-	TurnRight(530, 60); //90 degrees is around 440
+	TurnRight(530 + 20, 60); //90 degrees is around 440
 	writeDebugStreamLine("ProgrammingSkill_2) TurnRight");
 	MoveBackward(10, 50); //move back from the wall
 	writeDebugStreamLine("ProgrammingSkill_2) MoveBackward");
 	LiftDownAndStopAuto();
 	writeDebugStreamLine("ProgrammingSkill_2) LiftDown");
 	wait1Msec(globalWaiter);
-	MoveHelperAuto(70, 350);
+	MoveHelperAuto(80 + 10, 350 + 50);
 	wait1Msec(globalWaiter * 3);
-	SetPositionClawOnlyHelper(true, 900, 800);
+	SetPositionClawOnlyHelper(true, 850, 750);
 
 	wait1Msec(globalWaiter  * 2);
-	MoveForward(250 + 20 + 10, 100); //move back from the wall
+	MoveForward(250 - 50, 100); //move back from the wall
 	writeDebugStreamLine("ProgrammingSkill_2) MoveForward");
 	CloseClawAuto();
 	writeDebugStreamLine("ProgrammingSkill_2) CloseClawAuto");
 	MoveForward(30, 100); //move back from the wall
 	writeDebugStreamLine("ProgrammingSkill_2) MoveForward");
 
-	wait1Msec(5000);
+	wait1Msec(2000);
 
 	TurnLeft(200, 100); //90 degrees is around 440
 	writeDebugStreamLine("ProgrammingSkill_2) TurnLeft");
 	wait1Msec(globalWaiter);
-	LiftUpAuto(2000, 85);
+	LiftUpAuto(2000 - 100, 85 - 3);
 	writeDebugStreamLine("ProgrammingSkill_2) LiftUpAuto");
-	TurnLeft(300, 60); //90 degrees is around 440
+	TurnLeft(300 + 100, 60); //90 degrees is around 440
 	writeDebugStreamLine("ProgrammingSkill_2) TurnLeft");
 	wait1Msec(globalWaiter * 3);
 
-	ThrowAuto(500); // throw three stars #1
+	ThrowAutoAlt(500 - 250); // throw three stars #1
 	writeDebugStreamLine("ProgrammingSkill_2) ThrowAuto");
 
 	OpenClawAuto(1600 + 400);
@@ -374,16 +402,16 @@ void ProgrammingSkill_2(){
 	wait1Msec(globalWaiter);
 	CloseClawAuto();
 	writeDebugStreamLine("ProgrammingSkill_2) CloseClawAuto");
-	LiftUpAuto(2000, 85);
+	LiftUpAuto(2000 - 100, 85 - 3);
 
-	ThrowAuto(globalWaiter * 3); // throw cube #1
+	ThrowAutoAlt(globalWaiter * 7); // throw cube #1
 	writeDebugStreamLine("ProgrammingSkill_2) ThrowAuto");
 
 	OpenClawAuto(1600);
 	writeDebugStreamLine("ProgrammingSkill_2) OpenClawAuto");
 
 	wait1Msec(globalWaiter);
-	MoveForward(320, 100); //move forward to wall to pick up
+	MoveForward(320 + 30, 100); //move forward to wall to pick up
 	writeDebugStreamLine("ProgrammingSkill_2) MoveForward");
 	wait1Msec(globalWaiter);
 	CloseClawAuto();
@@ -391,9 +419,9 @@ void ProgrammingSkill_2(){
 
 	MoveBackward(50, 100); //move back from the wall
 	writeDebugStreamLine("ProgrammingSkill_2) MoveBackward");
-	LiftUpAuto(2000, 85);
+	LiftUpAuto(2000 - 100, 85 - 3);
 	writeDebugStreamLine("ProgrammingSkill_2) LiftUpAuto");
-	MoveBackward(400, 100); //move back to fence to throw
+	MoveBackward(400, 100 - 6); //move back to fence to throw
 	writeDebugStreamLine("ProgrammingSkill_2) MoveBackward");
 
 	ThrowAuto(globalWaiter); // throw three stars #2
@@ -413,7 +441,7 @@ void ProgrammingSkill_3(){
 	SetPositionClawOnlyHelper(true, 1000, 1000);
 	writeDebugStreamLine("ProgrammingSkill_3) SetPositionClawOnlyHelper");
 
-	MoveForward(100, 70); //move back from the wall
+	MoveForward(100, 70 - 20); //move back from the wall
 	writeDebugStreamLine("ProgrammingSkill_3) MoveForward");
 	CloseClawAuto();
 	writeDebugStreamLine("ProgrammingSkill_3) CloseClawAuto");
@@ -428,7 +456,7 @@ void ProgrammingSkill_3(){
 	writeDebugStreamLine("ProgrammingSkill_3) OpenClawAuto");
 
 	wait1Msec(globalWaiter);
-	MoveForward(600, 100); //move forward to pick up star #1
+	MoveForward(600 - 200, 100 - 30); //move forward to pick up star #2
 	writeDebugStreamLine("ProgrammingSkill_3) MoveForward");
 	wait1Msec(globalWaiter);
 	CloseClawAuto();
@@ -436,7 +464,7 @@ void ProgrammingSkill_3(){
 
 	CloseClaw(20);
 	writeDebugStreamLine("ProgrammingSkill_3) CloseClaw");
-	MoveBackward(60, 100); //move back from the wall
+	MoveBackward(60, 100 - 20); //move back from the wall
 	writeDebugStreamLine("ProgrammingSkill_3) MoveBackward");
 	LiftUpAuto(2000, 85);
 	writeDebugStreamLine("ProgrammingSkill_3) LiftUpAuto");
@@ -450,6 +478,12 @@ void ProgrammingSkill_3(){
 void ThrowAuto(int delay) {
 	MoveHelperAuto(-20, delay);
 	Throw(3000 + 400, 2000 + 500, MaxPower);
+	wait1Msec(globalWaiter);
+}
+
+void ThrowAutoAlt(int delay) {
+	MoveHelperAuto(-40, delay);
+	ThrowAlt(3000 + 400, 2000 + 500, MaxPower);
 	wait1Msec(globalWaiter);
 }
 
@@ -1154,9 +1188,9 @@ void DeployClaw()
 
 void SetKnockDown()
 {
-	int targetLift = 1900;
-	int targetLeftClaw = 1300;
-	int targetRightClaw = 1400;
+	int targetLift = 2000 + 200;
+	int targetLeftClaw = 1500;
+	int targetRightClaw = 1550;
 	SetPositionHelper(true, targetLift, targetLeftClaw, targetRightClaw);
 
 	LiftUp(30);
@@ -1271,6 +1305,8 @@ task Lift()
 		{
 			testMode = true;
 			ProgrammingSkill_2();
+			wait1Msec(globalWaiter * 2);
+			ProgrammingSkill_3();
 			testMode = false;
 
 		}
@@ -1359,6 +1395,46 @@ void Throw(int distanceLift, int distanceToThrow, int power){
 	StopClaw();
 	LiftDownAndStop_Touch_DefaultTimeout(60);
 	LiftDown(10);
+}
+
+void ThrowAlt(int distanceLift, int distanceToThrow, int power){
+
+	// CloseClaw(10);
+
+	while (abs(SensorValue[LiftPosition])<abs(distanceLift)){
+		LiftUp(power);
+		if (vexRT[Btn8L] == 1)
+		{
+			break;
+		}
+
+		if (abs(SensorValue[LiftPosition]) > distanceToThrow ){
+			OpenClaw(100 + 10);
+			// power = 0;
+		}
+	}
+
+	LiftStop();
+	StopClaw();
+	LiftDownAndStop_Touch_DefaultTimeout(60);
+	LiftDown(10);
+}
+
+void ThrowStay(int distanceLift, int distanceToThrow, int power) {
+	while (abs(SensorValue[LiftPosition])<abs(distanceLift)){
+		LiftUp(power);
+		if (vexRT[Btn8L] == 1)
+		{
+			break;
+		}
+
+		if (abs(SensorValue[LiftPosition]) > distanceToThrow ){
+			OpenClaw(100);
+			// power = 0;
+		}
+	}
+	LiftStop();
+	StopClaw();
 }
 
 void LiftUpNoStop(int distance, int power) {
