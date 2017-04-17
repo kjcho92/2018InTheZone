@@ -51,6 +51,7 @@ void ProgrammingSkill_3();
 
 void ThrowAuto(int delay);
 void ThrowAutoAlt(int delay);
+void ThrowAutoAlt2(int delay);
 void LiftUpAuto(int distance, int power);
 void LiftDownAndStopAuto();
 void MoveHelperAuto(int power, int delay);
@@ -359,28 +360,32 @@ void ProgrammingSkill_1(int iteration){
 }
 
 void ProgrammingSkill_2(){
+// 23 secs
+	long startTime = nPgmTime;
+
 	SetPositionHelper(false, 800, 400, 400);
 	wait1Msec(globalWaiter);
-	TurnRight(530 + 20, 60); //90 degrees is around 440
+	TurnRight(530 - 30 + 30, 60); //90 degrees is around 440
 	writeDebugStreamLine("ProgrammingSkill_2) TurnRight");
 	MoveBackward(10, 50); //move back from the wall
 	writeDebugStreamLine("ProgrammingSkill_2) MoveBackward");
 	LiftDownAndStopAuto();
 	writeDebugStreamLine("ProgrammingSkill_2) LiftDown");
 	wait1Msec(globalWaiter);
-	MoveHelperAuto(80 + 10, 350 + 50);
+	MoveHelperAuto(80 + 10, 350 - 150);
 	wait1Msec(globalWaiter * 3);
-	SetPositionClawOnlyHelper(true, 850, 750);
+	SetPositionClawOnlyHelper(true, 800, 900);
 
 	wait1Msec(globalWaiter  * 2);
-	MoveForward(250 - 50, 100); //move back from the wall
+	MoveForward(250 + 250 + 40, 110); //move back from the wall
 	writeDebugStreamLine("ProgrammingSkill_2) MoveForward");
 	CloseClawAuto();
+	CloseClaw(50);
 	writeDebugStreamLine("ProgrammingSkill_2) CloseClawAuto");
-	MoveForward(30, 100); //move back from the wall
+	// MoveForward(30, 100); //move back from the wall
 	writeDebugStreamLine("ProgrammingSkill_2) MoveForward");
 
-	wait1Msec(2000);
+	// wait1Msec(2000);
 
 	TurnLeft(200, 100); //90 degrees is around 440
 	writeDebugStreamLine("ProgrammingSkill_2) TurnLeft");
@@ -391,11 +396,15 @@ void ProgrammingSkill_2(){
 	writeDebugStreamLine("ProgrammingSkill_2) TurnLeft");
 	wait1Msec(globalWaiter * 3);
 
-	ThrowAutoAlt(500 - 250); // throw three stars #1
+	ThrowAutoAlt2(500 - 250); // throw three stars #1
+	LiftDownAndStop(2000, 60);
 	writeDebugStreamLine("ProgrammingSkill_2) ThrowAuto");
-
 	OpenClawAuto(1600 + 400);
 	writeDebugStreamLine("ProgrammingSkill_2) OpenClawAuto");
+	// wait1Msec(globalWaiter * 2);
+	LiftDownAndStopAuto();
+	writeDebugStreamLine("ProgrammingSkill_2) LiftDownAndStopAuto");
+
 	wait1Msec(globalWaiter);
 	MoveHelper(30);
 	writeDebugStreamLine("ProgrammingSkill_2) MoveHelper");
@@ -411,58 +420,79 @@ void ProgrammingSkill_2(){
 	writeDebugStreamLine("ProgrammingSkill_2) OpenClawAuto");
 
 	wait1Msec(globalWaiter);
-	MoveForward(320 + 30, 100); //move forward to wall to pick up
+	MoveForward(320 + 40, 100); //move forward to wall to pick up
 	writeDebugStreamLine("ProgrammingSkill_2) MoveForward");
 	wait1Msec(globalWaiter);
 	CloseClawAuto();
+	CloseClaw(15);
 	writeDebugStreamLine("ProgrammingSkill_2) CloseClawAuto");
 
 	MoveBackward(50, 100); //move back from the wall
 	writeDebugStreamLine("ProgrammingSkill_2) MoveBackward");
 	LiftUpAuto(2000 - 100, 85 - 3);
 	writeDebugStreamLine("ProgrammingSkill_2) LiftUpAuto");
-	MoveBackward(400, 100 - 6); //move back to fence to throw
+	MoveBackward(400 - 200, 100 - 6); //move back to fence to throw
 	writeDebugStreamLine("ProgrammingSkill_2) MoveBackward");
 
-	ThrowAuto(globalWaiter); // throw three stars #2
+	ThrowAutoAlt(globalWaiter); // throw three stars #2
 	writeDebugStreamLine("ProgrammingSkill_2) ThrowAuto");
+
+	writeDebugStreamLine("ProgrammingSkill_2) >>>>>>>>>>> Time: %d", nPgmTime - startTime);
+
 }
 
 void ProgrammingSkill_3(){
+// 13 secs
+	long startTime = nPgmTime;
+
 	SetPositionHelper(false, 800, 400, 400);
 	wait1Msec(globalWaiter);
-	TurnRight(530, 60); //90 degrees is around 440
+	TurnRight(530 + 10, 60); //90 degrees is around 440
 	writeDebugStreamLine("ProgrammingSkill_3) TurnRight");
+
+	writeDebugStreamLine("ProgrammingSkill_3) GyroPosition: %d", SensorValue[GyroPosition]);
+
 	LiftDownAndStopAuto();
 	writeDebugStreamLine("ProgrammingSkill_3) LiftDown");
 	wait1Msec(globalWaiter);
-	MoveForward(150, 70); //move back from the wall
+
+
+	MoveHelperAuto(80 + 10, 350 - 100);
+
 	writeDebugStreamLine("ProgrammingSkill_3) MoveForward");
-	SetPositionClawOnlyHelper(true, 1000, 1000);
+	SetPositionClawOnlyHelper(true, 900, 900);
 	writeDebugStreamLine("ProgrammingSkill_3) SetPositionClawOnlyHelper");
 
-	MoveForward(100, 70 - 20); //move back from the wall
+	MoveHelper(50);
+	wait1Msec(500);
+
+	MoveHelper(50 - 20);
+	wait1Msec(1000);
+	MoveHelper(0);
+
+	// MoveForward(100 - 60, 50); //move back from the wall
+
 	writeDebugStreamLine("ProgrammingSkill_3) MoveForward");
 	CloseClawAuto();
 	writeDebugStreamLine("ProgrammingSkill_3) CloseClawAuto");
 
-	MoveHelperAuto(-50, globalWaiter * 2);
+	MoveHelperAuto(-50, 200);
 	writeDebugStreamLine("ProgrammingSkill_3) MoveHelperAuto");
 	wait1Msec(globalWaiter);
-	TurnLeft(750, 60); //90 degrees is around 440
+	TurnLeft(530, 100); //90 degrees is around 440
 	writeDebugStreamLine("ProgrammingSkill_3) TurnLeft");
 	wait1Msec(globalWaiter * 2);
 	OpenClawAuto(2000);
 	writeDebugStreamLine("ProgrammingSkill_3) OpenClawAuto");
 
 	wait1Msec(globalWaiter);
-	MoveForward(600 - 200, 100 - 30); //move forward to pick up star #2
+	MoveForward(600 + 100, 100 - 30); //move forward to pick up star #2
 	writeDebugStreamLine("ProgrammingSkill_3) MoveForward");
 	wait1Msec(globalWaiter);
 	CloseClawAuto();
 	writeDebugStreamLine("ProgrammingSkill_3) CloseClawAuto");
 
-	CloseClaw(20);
+	CloseClaw(20 + 20);
 	writeDebugStreamLine("ProgrammingSkill_3) CloseClaw");
 	MoveBackward(60, 100 - 20); //move back from the wall
 	writeDebugStreamLine("ProgrammingSkill_3) MoveBackward");
@@ -473,6 +503,8 @@ void ProgrammingSkill_3(){
 
 	ThrowAuto(globalWaiter); // throw two stars and cube
 	writeDebugStreamLine("ProgrammingSkill_3) ThrowAuto");
+
+	writeDebugStreamLine("ProgrammingSkill_3) >>>>>>>>>>> Time: %d", nPgmTime - startTime);
 }
 
 void ThrowAuto(int delay) {
@@ -481,9 +513,20 @@ void ThrowAuto(int delay) {
 	wait1Msec(globalWaiter);
 }
 
+
+void ThrowAutoAlt2(int delay) {
+	MoveHelperAuto(-40, delay);
+	// ThrowAlt(3000 + 400, 2000 + 500, MaxPower);
+	ThrowStay(3000 + 400, 2000 + 500, MaxPower);
+
+	// wait1Msec(globalWaiter);
+}
+
 void ThrowAutoAlt(int delay) {
 	MoveHelperAuto(-40, delay);
 	ThrowAlt(3000 + 400, 2000 + 500, MaxPower);
+	// ThrowStay(3000 + 400, 2000 + 500, MaxPower);
+
 	wait1Msec(globalWaiter);
 }
 
@@ -557,6 +600,49 @@ void MoveValue_Accel(int distance, int power) {
 	int velocity = 0;
 	int position = 0;
 	int value = 0;
+	int previous = 0;
+
+	int current = position;
+	float offset = 0;
+
+	clearTimer(T3);
+	power = AdjustPowerUsingBatteryLevel(power);
+	while (abs(current + offset) < abs(distance)){
+
+		previous = current;
+
+		MoveHelper(power);
+		wait1Msec(100);
+
+		value = SensorValue[Accel_y];
+		velocity += value;
+		//velocity = (value == 0)? velocity : velocity + value;
+		position += velocity;
+
+		current = position;
+
+		offset = current - previous;
+		offset = offset * 1.6;
+
+		// writeDebugStreamLine("MoveValue_Accel) pos: %d, dis: %d ", position, distance);
+		if (time1[T3] >= 2000)
+		{
+			break;
+		}
+	}
+	MoveHelper(0);
+}
+
+void MoveValue_Accel_Normal(int distance, int power) {
+	// ClearEncoder();
+
+	//writeDebugStreamLine("MoveValue_Accel) Started ===");
+	//const float offset = 0.8;
+	//float distance = distance_or * offset;
+
+	int velocity = 0;
+	int position = 0;
+	int value = 0;
 	clearTimer(T3);
 	power = AdjustPowerUsingBatteryLevel(power);
 	while (abs(position) < abs(distance)){
@@ -576,7 +662,6 @@ void MoveValue_Accel(int distance, int power) {
 	MoveHelper(0);
 }
 
-
 void TurnRight(int distance, int power) {
 	TurnValueGyro (distance, power);
 }
@@ -587,9 +672,32 @@ void TurnLeft(int distance, int power) {
 
 void TurnValueGyro(int distance, int power) {
 	// wait1Msec(time);
+
+	long startTime = nPgmTime;
+	SensorValue[GyroPosition] = 0;
+	int current = SensorValue[GyroPosition];
+	int previous = 0;
+	float offset = 0;
+
+	power = AdjustPowerUsingBatteryLevel(power);
+	while ((current + offset) < distance && (nPgmTime - startTime) < 700){
+		previous = current;
+		Turn(power);
+
+		current = abs(SensorValue[GyroPosition]);
+		offset = current - previous;
+		offset = offset * 1.6;
+	}
+	Turn(0);
+}
+
+void TurnValueGyro_Normal(int distance, int power) {
+	// wait1Msec(time);
+
+	long startTime = nPgmTime;
 	SensorValue[GyroPosition] = 0;
 	power = AdjustPowerUsingBatteryLevel(power);
-	while (abs(SensorValue[GyroPosition])<abs(distance)){
+	while (abs(SensorValue[GyroPosition])<abs(distance) && (nPgmTime - startTime) < 700){
 		Turn(power);
 	}
 	Turn(0);
@@ -597,8 +705,8 @@ void TurnValueGyro(int distance, int power) {
 
 void Turn(int power)
 {
-	motor[WheelRightOne] = -power
-	;	motor[WheelLeftOne] = power;
+	motor[WheelRightOne] = -power;
+	motor[WheelLeftOne] = power;
 	motor[WheelRightTwo] = -power;
 	motor[WheelLeftTwo] = power;
 }
@@ -1490,10 +1598,9 @@ void LiftDownAndStop_Touch(int power, int timemout) {
 		}
 	}
 
-	if (SensorValue[LiftTouch] == 1){
-		// writeDebugStreamLine("LiftDownAndStop_Touch) Touched");
-		writeDebugStreamLine("LiftDownAndStop_Touch) LiftPosition: %d Touch: %d", abs(SensorValue[LiftPosition]), SensorValue[LiftTouch]);
-	}
+	// if (SensorValue[LiftTouch] == 1){
+	// 	writeDebugStreamLine("LiftDownAndStop_Touch) LiftPosition: %d Touch: %d", abs(SensorValue[LiftPosition]), SensorValue[LiftTouch]);
+	// }
 
 	LiftStop();
 }
